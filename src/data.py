@@ -11,7 +11,7 @@ class bern_emb_data():
         self.ns = ns
         self.n_epochs = n_epochs
         self.dynamic = dynamic
-        dat_stats = pickle.load(open(os.path.join(fpath, "dat_stats.pkl"), "a+"))
+        dat_stats = pickle.load(open(os.path.join(fpath, "dat_stats.pkl"), "rb"))
         self.T = len(dat_stats['T_bins'])
         self.name = dat_stats['name']
         if not self.dynamic:
@@ -103,26 +103,26 @@ class bern_emb_data():
         if self.dynamic:
             feed_dict = {}
             for t in range(self.T):
-                feed_dict[placeholder[t]] = self.batch[t].next()
+                feed_dict[placeholder[t]] = self.batch[t].__next__()
             return feed_dict
         else:
-            return {placeholder: self.batch.next()}
+            return {placeholder: self.batch.__next__()}
 
     def valid_feed(self, placeholder):
         if self.dynamic:
             feed_dict = {}
             for t in range(self.T):
-                feed_dict[placeholder[t]] = self.valid_batch[t].next()
+                feed_dict[placeholder[t]] = self.valid_batch[t].__next__()
             return feed_dict
         else:
-            return {placeholder: self.valid_batch.next()}
+            return {placeholder: self.valid_batch.__next__()}
 
     def test_feed(self, placeholder):
         if self.dynamic:
             feed_dict = {}
             for t in range(self.T):
-                feed_dict[placeholder[t]] = self.test_batch[t].next()
+                feed_dict[placeholder[t]] = self.test_batch[t].__next__()
             return feed_dict
         else:
-            return {placeholder: self.test_batch.next()}
+            return {placeholder: self.test_batch.__next__()}
 

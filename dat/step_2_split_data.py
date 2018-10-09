@@ -4,7 +4,7 @@ import pickle
 import pandas as pd
 
 # Change this to the name of the folder where your dataset is
-dataset_name = 'arxiv_ML'
+dataset_name = 'TNYT'
 
 files = glob.glob(dataset_name+'/train/*.npy')
 
@@ -17,7 +17,8 @@ for fname in files:
     prob = np.random.uniform(0,1,dat.shape)
     p = 1 - np.sqrt((10.0**(-5))/cnt[dat])
     dat = dat[prob > p]
-
+    
+    #if (len(dat) == 0): continue
     split = int(0.1*len(dat))
     i = np.random.randint(len(dat))
 

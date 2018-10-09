@@ -5,9 +5,9 @@ import pickle
 import re
 
 # Change this to the name of the folder where your dataset is
-dataset_name = 'arxiv_ML'
+dataset_name = 'TNYT'
 # Change this to the number of words you want in the vocabulary
-V = 5000
+V = 10000
 
 files = glob.glob(dataset_name +'/raw/*.txt')
 dictionary = {}

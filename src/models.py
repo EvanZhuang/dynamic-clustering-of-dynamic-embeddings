@@ -66,7 +66,7 @@ class emb_model(object):
 
     def plot_params(self, plot_only=500):
         with self.sess.as_default():
-	    tsne = TSNE(perplexity=30, n_components=2, init='pca', n_iter=5000)
+            tsne = TSNE(perplexity=30, n_components=2, init='pca', n_iter=5000)
             low_dim_embs_alpha2 = tsne.fit_transform(self.alpha.eval()[:plot_only])
             plot_with_labels(low_dim_embs_alpha2[:plot_only], self.labels[:plot_only], self.logdir + '/alpha.eps')
 
@@ -77,7 +77,7 @@ class emb_model(object):
     def print_word_similarities(self, words, num):
         query_word = tf.placeholder(dtype=tf.int32)
         #query_rho = tf.expand_dims(self.rho, [0])
-         
+
         val_rho, idx_rho = tf.nn.top_k(tf.matmul(tf.nn.l2_normalize(self.rho, dim=0), tf.nn.l2_normalize(self.alpha, dim=1), transpose_b=True), num)
 
         for x in words:
@@ -89,7 +89,7 @@ class emb_model(object):
                     text_file.write("\n%-20s %6.4f" % (self.labels[ir[0,ii]], vr[0,ii]))
 
     def print_topics(self, num):
-         pass
+        pass
 
     def initialize_training(self):
         optimizer = tf.train.AdamOptimizer()
@@ -122,7 +122,7 @@ class emb_model(object):
                 rho.metadata_path = '../vocab.tsv'
         projector.visualize_embeddings(self.train_writer, config)
 
-    
+
     def train_embeddings(self):
         for data_pass in range(self.n_iter):
             for step in range(self.n_epochs):
@@ -152,14 +152,14 @@ class bern_emb_model(emb_model):
             with tf.name_scope('input'):
                 self.placeholders = tf.placeholder(tf.int32)
                 self.words = self.placeholders
-            
+
 
             # Index Masks
             with tf.name_scope('context_mask'):
-                self.p_mask = tf.cast(tf.range(self.cs/2, self.n_minibatch + self.cs/2),tf.int32)
-                rows = tf.cast(tf.tile(tf.expand_dims(tf.range(0, self.cs/2),[0]), [self.n_minibatch, 1]),tf.int32)
-                columns = tf.cast(tf.tile(tf.expand_dims(tf.range(0, self.n_minibatch), [1]), [1, self.cs/2]),tf.int32)
-                self.ctx_mask = tf.concat([rows+columns, rows+columns +self.cs/2+1], 1)
+                self.p_mask = tf.cast(tf.range(int(self.cs/2), self.n_minibatch + int(self.cs/2)),tf.int32)
+                rows = tf.cast(tf.tile(tf.expand_dims(tf.range(0, int(self.cs/2)),[0]), [self.n_minibatch, 1]),tf.int32)
+                columns = tf.cast(tf.tile(tf.expand_dims(tf.range(0, self.n_minibatch), [1]), [1, int(self.cs/2)]),tf.int32)
+                self.ctx_mask = tf.concat([rows+columns, rows+columns +int(self.cs/2)+1], 1)
 
             with tf.name_scope('embeddings'):
                 self.rho = tf.Variable(self.rho_init, name='rho')
@@ -177,7 +177,7 @@ class bern_emb_model(emb_model):
                 with tf.name_scope('target_word'):
                     self.p_idx = tf.gather(self.words, self.p_mask)
                     self.p_rho = tf.squeeze(tf.gather(self.rho, self.p_idx))
-                
+
                 # Negative samples
                 with tf.name_scope('negative_samples'):
                     unigram_logits = tf.tile(tf.expand_dims(tf.log(tf.constant(self.unigram)), [0]), [self.n_minibatch, 1])
@@ -193,25 +193,25 @@ class bern_emb_model(emb_model):
                 ctx_sum = tf.reduce_sum(self.ctx_alphas,[1])
                 self.p_eta = tf.expand_dims(tf.reduce_sum(tf.multiply(self.p_rho, ctx_sum),-1),1)
                 self.n_eta = tf.reduce_sum(tf.multiply(self.n_rho, tf.tile(tf.expand_dims(ctx_sum,1),[1,self.ns,1])),-1)
-            
+
             # Conditional likelihood
             self.y_pos = Bernoulli(logits = self.p_eta)
             self.y_neg = Bernoulli(logits = self.n_eta)
 
-            self.ll_pos = tf.reduce_sum(self.y_pos.log_prob(1.0)) 
+            self.ll_pos = tf.reduce_sum(self.y_pos.log_prob(1.0))
             self.ll_neg = tf.reduce_sum(self.y_neg.log_prob(0.0))
 
             self.log_likelihood = self.ll_pos + self.ll_neg
-            
+
             scale = 1.0*self.N/self.n_minibatch
             self.loss = - (self.n_epochs * self.log_likelihood + self.log_prior)
 
 
     def dump(self, fname):
-            with self.sess.as_default():
-              dat = {'rho':  self.rho.eval(),
-                     'alpha':  self.alpha.eval()}
-            pickle.dump( dat, open( fname, "a+" ) )
+        with self.sess.as_default():
+            dat = {'rho':  self.rho.eval(),
+                   'alpha':  self.alpha.eval()}
+        pickle.dump( dat, open( fname, "wb" ) )
 
 
 
@@ -225,9 +225,9 @@ class dynamic_bern_emb_model(emb_model):
 
                 self.rho_t = {}
                 for t in range(-1,self.T):
-                    self.rho_t[t] = tf.Variable(self.rho_init 
-                        + 0.001*tf.random_normal([self.L, self.K])/self.K,
-                        name = 'rho_'+str(t))
+                    self.rho_t[t] = tf.Variable(self.rho_init
+                                                + 0.001*tf.random_normal([self.L, self.K])/self.K,
+                                                name = 'rho_'+str(t))
 
                 with tf.name_scope('priors'):
                     global_prior = Normal(loc = 0.0, scale = self.sig)
@@ -236,7 +236,7 @@ class dynamic_bern_emb_model(emb_model):
                     self.log_prior = tf.reduce_sum(global_prior.log_prob(self.alpha))
                     self.log_prior = tf.reduce_sum(global_prior.log_prob(self.rho_t[-1]))
                     for t in range(self.T):
-                        self.log_prior += tf.reduce_sum(local_prior.log_prob(self.rho_t[t] - self.rho_t[t-1])) 
+                        self.log_prior += tf.reduce_sum(local_prior.log_prob(self.rho_t[t] - self.rho_t[t-1]))
 
             with tf.name_scope('likelihood'):
                 self.placeholders = {}
@@ -246,11 +246,11 @@ class dynamic_bern_emb_model(emb_model):
                 self.ll_neg = 0.0
                 for t in range(self.T):
                     # Index Masks
-                    p_mask = tf.range(self.cs/2,self.n_minibatch[t] + self.cs/2)
-                    rows = tf.tile(tf.expand_dims(tf.range(0, self.cs/2),[0]), [self.n_minibatch[t], 1])
-                    columns = tf.tile(tf.expand_dims(tf.range(0, self.n_minibatch[t]), [1]), [1, self.cs/2])
-                    
-                    ctx_mask = tf.concat([rows+columns, rows+columns +self.cs/2+1], 1)
+                    p_mask = tf.range(int(self.cs/2),self.n_minibatch[t] + int(self.cs/2))
+                    rows = tf.tile(tf.expand_dims(tf.range(0, int(self.cs/2)),[0]), [self.n_minibatch[t], 1])
+                    columns = tf.tile(tf.expand_dims(tf.range(0, self.n_minibatch[t]), [1]), [1, int(self.cs/2)])
+
+                    ctx_mask = tf.concat([rows+columns, rows+columns +int(self.cs/2)+1], 1)
 
                     # Data Placeholder
                     self.placeholders[t] = tf.placeholder(tf.int32, shape = (self.n_minibatch[t] + self.cs))
@@ -258,7 +258,7 @@ class dynamic_bern_emb_model(emb_model):
                     # Taget and Context Indices
                     p_idx = tf.gather(self.placeholders[t], p_mask)
                     ctx_idx = tf.squeeze(tf.gather(self.placeholders[t], ctx_mask))
-                    
+
                     # Negative samples
                     unigram_logits = tf.tile(tf.expand_dims(tf.log(tf.constant(self.unigram)), [0]), [self.n_minibatch[t], 1])
                     n_idx = tf.multinomial(unigram_logits, self.ns)
@@ -273,22 +273,22 @@ class dynamic_bern_emb_model(emb_model):
                     ctx_sum = tf.reduce_sum(ctx_alphas,[1])
                     p_eta = tf.expand_dims(tf.reduce_sum(tf.multiply(p_rho, ctx_sum),-1),1)
                     n_eta = tf.reduce_sum(tf.multiply(n_rho, tf.tile(tf.expand_dims(ctx_sum,1),[1,self.ns,1])),-1)
-                    
+
                     # Conditional likelihood
                     self.y_pos[t] = Bernoulli(logits = p_eta)
                     self.y_neg[t] = Bernoulli(logits = n_eta)
 
-                    self.ll_pos += tf.reduce_sum(self.y_pos[t].log_prob(1.0)) 
+                    self.ll_pos += tf.reduce_sum(self.y_pos[t].log_prob(1.0))
                     self.ll_neg += tf.reduce_sum(self.y_neg[t].log_prob(0.0))
 
             self.loss = - (self.n_epochs * (self.ll_pos + self.ll_neg) + self.log_prior)
 
     def dump(self, fname):
-            with self.sess.as_default():
-                dat = {'alpha':  self.alpha.eval()}
-                for t in range(self.T):
-                    dat['rho_'+str(t)] = self.rho_t[t].eval()
-            pickle.dump( dat, open( fname, "a+" ) )
+        with self.sess.as_default():
+            dat = {'alpha':  self.alpha.eval()}
+            for t in range(self.T):
+                dat['rho_'+str(t)] = self.rho_t[t].eval()
+        pickle.dump( dat, open( fname, "wb" ) )
 
     def eval_log_like(self, feed_dict):
         log_p = np.zeros((0,1))
@@ -300,7 +300,7 @@ class dynamic_bern_emb_model(emb_model):
 
     def plot_params(self, plot_only=500):
         with self.sess.as_default():
-	    tsne = TSNE(perplexity=30, n_components=2, init='pca', n_iter=5000)
+            tsne = TSNE(perplexity=30, n_components=2, init='pca', n_iter=5000)
             low_dim_embs_alpha = tsne.fit_transform(self.alpha.eval()[:plot_only])
             plot_with_labels(low_dim_embs_alpha[:plot_only], self.labels[:plot_only], self.logdir + '/alpha.eps')
             for t in [0, int(self.T/2), self.T-1]:
@@ -320,20 +320,20 @@ class dynamic_bern_emb_model(emb_model):
         words = self.labels[w_idx]
         f_name = self.logdir + '/top_drifting_words.txt'
         with open(f_name, "w+") as text_file:
-           for (w, drift) in zip(w_idx,dist):
-               text_file.write("\n%-20s %6.4f" % (self.labels[w], drift))
+            for (w, drift) in zip(w_idx,dist):
+                text_file.write("\n%-20s %6.4f" % (self.labels[w], drift))
         return words
 
     def print_word_similarities(self, words, num):
         query_word = tf.placeholder(dtype=tf.int32)
         query_rho_t = tf.placeholder(dtype=tf.float32)
-         
+
         val_rho, idx_rho = tf.nn.top_k(tf.matmul(tf.nn.l2_normalize(query_rho_t, dim=0), tf.nn.l2_normalize(self.alpha, dim=1), transpose_b=True), num)
 
         for x in words:
             f_name = os.path.join(self.logdir, '%s_queries.txt' % (x))
             with open(f_name, "w+") as text_file:
-                for t_idx in xrange(self.T):
+                for t_idx in range(self.T):
                     with self.sess.as_default():
                         rho_t = self.rho_t[t_idx].eval()
                     vr, ir = self.sess.run([val_rho, idx_rho], {query_word: self.dictionary[x], query_rho_t: rho_t})
