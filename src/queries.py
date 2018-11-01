@@ -13,6 +13,7 @@ from models import *
 from args import *
 from utils import *
 
+qList = ['chinese', 'immigrant', 'immigration', 'political', 'communist', 'party', 'mao']
 
 args = parse_args()
 
@@ -25,4 +26,4 @@ m = define_model(args, d, dir_name)
 
 m.initialize_training()
 
-m.train_embeddings()
+m.print_word_similarities_test(qList, 20)

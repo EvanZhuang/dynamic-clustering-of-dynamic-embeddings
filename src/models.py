@@ -41,7 +41,7 @@ class emb_model(object):
             if 'alpha_constant' in args.init:
                 self.alpha_trainable = False
                 fname = fname.replace('/alpha_constant','')
-            fit = pickle.load(open(fname))
+            fit = pickle.load(open(fname, 'rb'))
             self.rho_init = fit['rho']
             self.alpha_init = fit['alpha']
         else:
@@ -221,13 +221,27 @@ class dynamic_bern_emb_model(emb_model):
 
         with tf.name_scope('model'):
             with tf.name_scope('embeddings'):
-                self.alpha = tf.Variable(self.alpha_init, name='alpha', trainable=self.alpha_trainable)
+                if args.dinit:
+                    fname = os.path.join('fits', d.name, args.dinit)
+                    if 'alpha_constant' in args.dinit:
+                        self.alpha_trainable = False
+                        fname = fname.replace('/alpha_constant', '')
+                    fit = pickle.load(open(fname, 'rb'))
+                    self.rho_t = {}
+                    self.rho_t[-1] = tf.Variable(self.rho_init
+                                                    + 0.001 * tf.random_normal([self.L, self.K]) / self.K,
+                                                    name='rho_' + str(-1))
+                    for t in range(self.T):
+                        self.rho_t[t] = fit['rho_' + str(t)]
+                    self.alpha = fit['alpha']
+                else:
+                    self.alpha = tf.Variable(self.alpha_init, name='alpha', trainable=self.alpha_trainable)
 
-                self.rho_t = {}
-                for t in range(-1,self.T):
-                    self.rho_t[t] = tf.Variable(self.rho_init
-                                                + 0.001*tf.random_normal([self.L, self.K])/self.K,
-                                                name = 'rho_'+str(t))
+                    self.rho_t = {}
+                    for t in range(-1, self.T):
+                        self.rho_t[t] = tf.Variable(self.rho_init
+                                                    + 0.001 * tf.random_normal([self.L, self.K]) / self.K,
+                                                    name='rho_' + str(t))
 
                 with tf.name_scope('priors'):
                     global_prior = Normal(loc = 0.0, scale = self.sig)
@@ -340,6 +354,28 @@ class dynamic_bern_emb_model(emb_model):
                     text_file.write("\n\n=====================================\n%s, t = %d\n=====================================" % (x,t_idx))
                     for ii in range(num):
                         text_file.write("\n%-20s %6.4f" % (self.labels[ir[0,ii]], vr[0,ii]))
+    
+    def print_word_similarities_test(self, words, num):
+        query_word = tf.placeholder(dtype=tf.int32)
+        query_rho_t = tf.placeholder(dtype=tf.float32)
+        calOnly = 500
+
+        for x in words:
+            f_name = os.path.join(self.logdir, '%s_queries.txt' % (x))
+            with open(f_name, "w+") as text_file:
+                for t_idx in range(self.T):
+                    val_rho, idx_rho = tf.nn.top_k(tf.transpose(tf.matmul(tf.nn.l2_normalize(query_rho_t, axis=1), tf.nn.l2_normalize(tf.expand_dims(query_rho_t[self.dictionary[x],:],-1), axis=0))), num)
+                    with self.sess.as_default():
+                        rho_t = self.rho_t[t_idx]
+                        print(rho_t.shape)
+                    vr, ir = self.sess.run([val_rho, idx_rho], {query_word: self.dictionary[x], query_rho_t: rho_t})
+                    text_file.write("\n\n=====================================\n%s, t = %d\n=====================================" % (x,t_idx))
+                    for ii in range(num):
+                        text_file.write("\n%-20s %6.4f" % (self.labels[ir[0,ii]], vr[0,ii]))
+
+    def GMM(self, P = 2):
+        # WAITING to be migrated
+
 
     def print_topics(self, num):
         pass

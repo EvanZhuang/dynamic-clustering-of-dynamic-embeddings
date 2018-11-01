@@ -27,6 +27,9 @@ def parse_args():
         parser.add_argument('--init', type=str, default='',
                             help='Folder name to load variational.dat for initialization. Default is \'\' for no initialization')
 
+        parser.add_argument('--dinit', type=str, default='',
+                            help='Folder name to load variational.dat for initialization. Default is \'\' for no initialization')
+
         parser.add_argument('--fpath', type=str, default='../dat/arxiv_ML/',
                             help='path to data')
 
