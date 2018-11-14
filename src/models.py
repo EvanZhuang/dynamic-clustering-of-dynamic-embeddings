@@ -248,7 +248,7 @@ class dynamic_bern_emb_model(emb_model):
                     local_prior = Normal(loc = 0.0, scale = self.sig/100.0)
 
                     self.log_prior = tf.reduce_sum(global_prior.log_prob(self.alpha))
-                    self.log_prior = tf.reduce_sum(global_prior.log_prob(self.rho_t[-1]))
+                    self.log_prior += tf.reduce_sum(global_prior.log_prob(self.rho_t[-1]))
                     for t in range(self.T):
                         self.log_prior += tf.reduce_sum(local_prior.log_prob(self.rho_t[t] - self.rho_t[t-1]))
 
