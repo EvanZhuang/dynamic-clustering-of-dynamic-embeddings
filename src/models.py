@@ -374,9 +374,19 @@ class dynamic_bern_emb_model(emb_model):
                     for ii in range(num):
                         text_file.write("\n%-20s %6.4f" % (self.labels[ir[0,ii]], vr[0,ii]))
 
-    def GMM(self, P = 2):
-        # WAITING to be migrated
-        pass
+    def GMM(self, components = 3):
+        f_name = os.path.join(self.logdir, '%s_mixtures.txt' % (x))
+        with open(f_name, "w+") as text_file:
+            for t_idx in range(self.T):
+                with self.sess.as_default():
+                    rho_t = self.rho_t[t_idx]
+                    print(rho_t.shape)
+                vr, ir = self.sess.run([val_rho, idx_rho], {query_word: self.dictionary[x], query_rho_t: rho_t})
+                text_file.write(
+                    "\n\n=====================================\n%s, t = %d\n=====================================" % (
+                    x, t_idx))
+                for ii in range(num):
+                    text_file.write("\n%-20s %6.4f" % (self.labels[ir[0, ii]], vr[0, ii]))
 
 
     def print_topics(self, num):
