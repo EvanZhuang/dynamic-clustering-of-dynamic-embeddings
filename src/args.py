@@ -24,6 +24,15 @@ def parse_args():
         parser.add_argument('--dynamic', type=bool, default=False,
                             help='Dynamics on rho. Default is False.')
 
+        parser.add_argument('--VI', type=bool, default=False,
+                            help='Dynamics on rho. Default is False.')
+
+        parser.add_argument('--HMC', type=bool, default=False,
+                            help='Dynamics on rho. Default is False.')
+
+        parser.add_argument('--components', type=int, default=3,
+                            help='Context size. Default is 4.')
+
         parser.add_argument('--init', type=str, default='',
                             help='Folder name to load variational.dat for initialization. Default is \'\' for no initialization')
 
