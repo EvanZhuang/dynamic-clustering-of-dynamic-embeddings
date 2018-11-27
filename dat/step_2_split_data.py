@@ -4,7 +4,7 @@ import pickle
 import pandas as pd
 
 # Change this to the name of the folder where your dataset is
-dataset_name = 'TNYT'
+dataset_name = 'arxiv_ML'
 
 files = glob.glob(dataset_name+'/train/*.npy')
 
