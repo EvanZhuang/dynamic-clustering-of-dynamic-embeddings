@@ -17,6 +17,7 @@ tfb = tfp.bijectors
 #dtype = np.float32
 
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
+tf.logging.set_verbosity(tf.logging.ERROR)
 
 class emb_model(object):
     def __init__(self, args, d, logdir):
@@ -39,7 +40,7 @@ class emb_model(object):
         self.query_words = d.query_words
         self.train_feed = d.train_feed
         #self.valid_data = d.valid_data
-        #self.test_data = d.test_data
+        self.test_feed = d.test_feed
         self.n_iter = args.n_iter
         self.n_epochs = d.n_epochs
         self.n_test = d.n_test
@@ -233,27 +234,13 @@ class dynamic_bern_emb_model(emb_model):
 
         with tf.name_scope('model'):
             with tf.name_scope('embeddings'):
-                if args.dinit:
-                    fname = os.path.join('fits', d.name, args.dinit)
-                    if 'alpha_constant' in args.dinit:
-                        self.alpha_trainable = False
-                        fname = fname.replace('/alpha_constant', '')
-                    fit = pickle.load(open(fname, 'rb'))
-                    self.rho_t = {}
-                    self.rho_t[-1] = tf.Variable(self.rho_init
-                                                    + 0.001 * tf.random_normal([self.L, self.K]) / self.K,
-                                                    name='rho_' + str(-1))
-                    for t in range(self.T):
-                        self.rho_t[t] = fit['rho_' + str(t)]
-                    self.alpha = fit['alpha']
-                else:
-                    self.alpha = tf.Variable(self.alpha_init, name='alpha', trainable=self.alpha_trainable)
+                self.alpha = tf.Variable(self.alpha_init, name='alpha', trainable=self.alpha_trainable)
 
-                    self.rho_t = {}
-                    for t in range(-1, self.T):
-                        self.rho_t[t] = tf.Variable(self.rho_init
-                                                    + 0.001 * tf.random_normal([self.L, self.K]) / self.K,
-                                                    name='rho_' + str(t))
+                self.rho_t = {}
+                for t in range(-1, self.T):
+                    self.rho_t[t] = tf.Variable(self.rho_init
+                                                + 0.001 * tf.random_normal([self.L, self.K]) / self.K,
+                                                name='rho_' + str(t))
 
                 with tf.name_scope('priors'):
                     global_prior = Normal(loc = 0.0, scale = self.sig)
@@ -613,295 +600,6 @@ class dynamic_context_dynamic_bern_emb_model(emb_model):
     def print_topics(self, num):
         pass
 
-
-class dynamic_clustering_dynamic_context_bern_emb_model(emb_model):
-    def __init__(self, args, d, logdir):
-        super(dynamic_clustering_dynamic_context_bern_emb_model, self).__init__(args, d, logdir)
-        dims = self.K
-        components = 4
-        dtype = np.float32
-        with tf.name_scope('model'):
-            self.alpha_t = {}
-            for t in range(-1, self.T):
-                self.alpha_t[t] = tf.Variable(self.alpha_init
-                                              + 0.001 * tf.random_normal([self.L, self.K]) / self.K,
-                                              name='alpha_' + str(t))
-            #self.alpha = tf.Variable(self.alpha_init, name='alpha', trainable=self.alpha_trainable)
-            self.rho = tf.Variable(self.rho_init, name='rho')
-            pi = tfd.Dirichlet(
-                concentration=np.ones(components, dtype) * 1e7,
-                name='pi_dist')
-
-            mu = tfd.Independent(
-                tfd.Normal(
-                    loc=np.stack([np.zeros(dims, dtype)] * components),
-                    scale=tf.ones([components, dims], dtype)),
-                reinterpreted_batch_ndims=1,
-                name='mu_dist')
-
-            sigma = tfd.Wishart(
-                df=dims,
-                scale_tril=np.stack([np.eye(dims, dtype=dtype)] * components),
-                input_output_cholesky=True,
-                name='sigma_dist')
-
-            def joint_log_prob(observations, mix_probs, loc, chol_precision):
-                rv_observations = tfd.MixtureSameFamily(
-                    mixture_distribution=tfd.Categorical(probs=mix_probs),
-                    components_distribution=tfd.MultivariateNormalTriL(
-                        loc=loc,
-                        scale_tril=chol_precision))
-                log_prob_parts = [
-                    rv_observations.log_prob(observations),  # Sum over samples.
-                    pi.log_prob(mix_probs)[..., tf.newaxis],
-                    mu.log_prob(loc),  # Sum over components.
-                    sigma.log_prob(chol_precision),  # Sum over components.
-                ]
-                sum_log_prob = tf.reduce_sum(tf.concat(log_prob_parts, axis=-1), axis=-1)
-                # Note: for easy debugging, uncomment the following:
-                # sum_log_prob = tf.Print(sum_log_prob, log_prob_parts)
-                return sum_log_prob
-            initial_state = [
-                tf.fill([components],
-                        value=np.array(1. / components, dtype),
-                        name='mix_probs'),
-                tf.constant(np.stack([np.zeros(dims, dtype)] * components),
-                            name='mu'),
-                tf.eye(dims, batch_shape=[components], dtype=dtype, name='chol_precision'),
-            ]
-            unconstraining_bijectors = [
-                tfb.SoftmaxCentered(),
-                tfb.Identity(),
-                tfb.Chain([
-                    tfb.TransformDiagonal(tfb.Softplus()),
-                    tfb.FillTriangular(),
-                ])]
-            mcstep_size = tf.get_variable(
-                name='step_size',
-                initializer=np.array(5. ** -7, dtype),
-                use_resource=True,
-                trainable=False)
-            unnormalized_posterior_log_prob = functools.partial(joint_log_prob, self.rho)
-            [mix_probs, loc, chol_precision], kernel_results = tfp.mcmc.sample_chain(
-                num_results=20,
-                num_burnin_steps=0,
-                current_state=initial_state,
-                kernel=tfp.mcmc.TransformedTransitionKernel(
-                    inner_kernel=tfp.mcmc.HamiltonianMonteCarlo(
-                        target_log_prob_fn=unnormalized_posterior_log_prob,
-                        step_size=mcstep_size,
-                        step_size_update_fn=tfp.mcmc.make_simple_step_size_update_policy(),
-                        num_leapfrog_steps=3),
-                    bijector=unconstraining_bijectors))
-            self.mix_prob = tf.reduce_mean(mix_probs, axis=0)
-            self.mean =  tf.reduce_mean(loc, axis=0)
-            self.scale = tf.reduce_mean(chol_precision, axis=0)
-            self.mcmc_rate = tf.reduce_mean(tf.to_float(kernel_results.inner_results.is_accepted))
-            with tf.name_scope('priors'):
-                global_prior = Normal(loc=0.0, scale=self.sig)
-                local_prior = Normal(loc=0.0, scale=self.sig / 100.0)
-
-                # self.log_prior = tf.reduce_sum(global_prior.log_prob(self.alpha))########
-                self.log_prior = tf.reduce_sum(global_prior.log_prob(self.alpha_t[-1]))
-                for t in range(self.T):
-                    self.log_prior += tf.reduce_sum(local_prior.log_prob(self.alpha_t[t] - self.alpha_t[t - 1]))
-
-                #self.log_prior += tf.reduce_sum(global_prior.log_prob(self.rho))
-                self.log_prior += tf.reduce_sum(mu.log_prob(self.mean))
-                self.log_prior += tf.reduce_sum(sigma.log_prob(self.scale))
-                self.log_prior += tf.reduce_sum(pi.log_prob(self.mix_prob))
-        with tf.name_scope('likelihood'):
-            self.placeholders = {}
-            self.y_pos = {}
-            self.y_neg = {}
-            self.ll_pos = 0.0
-            self.ll_neg = 0.0
-            for t in range(self.T):
-                # Index Masks
-                p_mask = tf.range(int(self.cs / 2), self.n_minibatch[t] + int(self.cs / 2))
-                rows = tf.tile(tf.expand_dims(tf.range(0, int(self.cs / 2)), [0]), [self.n_minibatch[t], 1])
-                columns = tf.tile(tf.expand_dims(tf.range(0, self.n_minibatch[t]), [1]), [1, int(self.cs / 2)])
-
-                ctx_mask = tf.concat([rows + columns, rows + columns + int(self.cs / 2) + 1], 1)
-
-                # Data Placeholder
-                self.placeholders[t] = tf.placeholder(tf.int32, shape=(self.n_minibatch[t] + self.cs))
-
-                # Taget and Context Indices
-                p_idx = tf.gather(self.placeholders[t], p_mask)
-                # ctx_idx = tf.squeeze(tf.gather(self.placeholders[t], ctx_mask))#######
-                ctx_idx = tf.gather(self.placeholders[t], ctx_mask)
-
-                # Negative samples
-                unigram_logits = tf.tile(tf.expand_dims(tf.log(tf.constant(self.unigram)), [0]),
-                                         [self.n_minibatch[t], 1])
-                n_idx = tf.multinomial(unigram_logits, self.ns)
-
-                # Context vectors
-                # ctx_alphas = tf.gather(self.alpha, ctx_idx)#######
-                ctx_alphas = tf.squeeze(tf.gather(self.alpha_t[t], ctx_idx))
-
-                p_rho = tf.squeeze(tf.gather(self.rho, p_idx))
-                n_rho = tf.gather(self.rho, n_idx)
-
-                # Natural parameter
-                ctx_sum = tf.reduce_sum(ctx_alphas, [1])
-                p_eta = tf.expand_dims(tf.reduce_sum(tf.multiply(p_rho, ctx_sum), -1), 1)
-                n_eta = tf.reduce_sum(tf.multiply(n_rho, tf.tile(tf.expand_dims(ctx_sum, 1), [1, self.ns, 1])), -1)
-
-                # Conditional likelihood
-                self.y_pos[t] = Bernoulli(logits=p_eta)
-                self.y_neg[t] = Bernoulli(logits=n_eta)
-
-                self.ll_pos += tf.reduce_sum(self.y_pos[t].log_prob(1.0))
-                self.ll_neg += tf.reduce_sum(self.y_neg[t].log_prob(0.0))
-                self.log_prob = joint_log_prob(self.rho,self.mix_prob,self.mean,self.scale)
-
-        self.loss = - ((self.ll_pos + self.ll_neg + self.log_prob) + self.log_prior)
-
-    def initialize_training(self):
-        optimizer = tf.train.AdamOptimizer()
-        self.train = optimizer.minimize(self.loss)
-        self.sess = tf.Session()
-        with self.sess.as_default():
-            tf.global_variables_initializer().run()
-
-        for t in range(self.T):
-            variable_summaries('alpha_'+str(t), self.alpha_t[t])
-        with tf.name_scope('objective'):
-            tf.summary.scalar('loss', self.loss)
-            tf.summary.scalar('priors', self.log_prior)
-            tf.summary.scalar('ll_pos', self.ll_pos)
-            tf.summary.scalar('ll_neg', self.ll_neg)
-        self.summaries = tf.summary.merge_all()
-        self.train_writer = tf.summary.FileWriter(self.logdir, self.sess.graph)
-        self.saver = tf.train.Saver()
-        config = projector.ProjectorConfig()
-        rho = config.embeddings.add()
-        rho.tensor_name = 'model/embeddings/rho'
-        rho.metadata_path = '../vocab.tsv'
-        if not self.dynamic:
-            alpha = config.embeddings.add()
-            alpha.tensor_name = 'model/embeddings/alpha'
-            alpha.metadata_path = '../vocab.tsv'
-        else:
-            for t in range(self.T):
-                alpha = config.embeddings.add()
-                alpha.tensor_name = 'model/embeddings/alpha_' + str(t)
-                alpha.metadata_path = '../vocab.tsv'
-        projector.visualize_embeddings(self.train_writer, config)
-
-
-    def train_embeddings(self):
-        for data_pass in range(self.n_iter):
-            for step in range(self.n_epochs):
-                if step % 10 == 0:
-                    print(str(step)+'/'+str(self.n_epochs)+'   iter '+str(data_pass))
-                    self.print_topics()
-                    summary,_, train_loss, gmm_loss = self.sess.run([self.summaries, self.train, self.loss, self.log_prob], feed_dict=self.train_feed(self.placeholders))
-                    print(train_loss,gmm_loss)
-                    self.train_writer.add_summary(summary, data_pass*(self.n_epochs) + step)
-                else:
-                    self.sess.run([self.train], feed_dict=self.train_feed(self.placeholders))
-            self.dump(self.logdir+"/variational"+str(data_pass)+".dat")
-            self.saver.save(self.sess, os.path.join(self.logdir, "model.ckpt"), data_pass)
-        self.print_topics()
-        self.print_word_similarities(self.query_words, 10)
-        if self.dynamic:
-            words = self.detect_drift()
-            self.print_word_similarities(words[:10], 1)
-        self.plot_params(500)
-
-    def dump(self, fname):
-        with self.sess.as_default():
-            dat = {'alpha': self.alpha.eval()}
-            for t in range(self.T):
-                dat['rho_' + str(t)] = self.rho_t[t].eval()
-        pickle.dump(dat, open(fname, "wb"))
-
-    def eval_log_like(self, feed_dict):
-        log_p = np.zeros((0, 1))
-        for t in range(self.T):
-            log_p_t = self.sess.run(tf.log(self.y_pos[t].mean() + 0.000001), feed_dict=feed_dict)
-            log_p = np.vstack((log_p, log_p_t))
-        return log_p
-
-    def plot_params(self, plot_only=500):
-        with self.sess.as_default():
-            tsne = TSNE(perplexity=30, n_components=2, init='pca', n_iter=5000)
-            low_dim_embs_alpha = tsne.fit_transform(self.alpha.eval()[:plot_only])
-            plot_with_labels(low_dim_embs_alpha[:plot_only], self.labels[:plot_only], self.logdir + '/alpha.eps')
-            for t in [0, int(self.T / 2), self.T - 1]:
-                w_idx_t = range(plot_only)
-                np_rho = self.rho_t[t].eval()
-                tsne = TSNE(perplexity=30, n_components=2, init='pca', n_iter=5000)
-                low_dim_embs_rho = tsne.fit_transform(np_rho[w_idx_t, :])
-                plot_with_labels(low_dim_embs_rho, self.labels[w_idx_t], self.logdir + '/rho_' + str(t) + '.eps')
-
-    def detect_drift(self, metric='total_dist'):
-        if metric == 'total_dist':
-            tf_dist, tf_w_idx = tf.nn.top_k(tf.reduce_sum(tf.square(self.rho_t[self.T - 1] - self.rho_t[0]), 1), 500)
-        else:
-            print('unknown metric')
-            return
-        dist, w_idx = self.sess.run([tf_dist, tf_w_idx])
-        words = self.labels[w_idx]
-        f_name = self.logdir + '/top_drifting_words.txt'
-        with open(f_name, "w+") as text_file:
-            for (w, drift) in zip(w_idx, dist):
-                text_file.write("\n%-20s %6.4f" % (self.labels[w], drift))
-        return words
-
-    def print_word_similarities(self, words, num):
-        query_word = tf.placeholder(dtype=tf.int32)
-        query_rho_t = tf.placeholder(dtype=tf.float32)
-
-        val_rho, idx_rho = tf.nn.top_k(
-            tf.matmul(tf.nn.l2_normalize(query_rho_t, dim=0), tf.nn.l2_normalize(self.alpha, dim=1), transpose_b=True),
-            num)
-
-        for x in words:
-            f_name = os.path.join(self.logdir, '%s_queries.txt' % (x))
-            with open(f_name, "w+") as text_file:
-                for t_idx in range(self.T):
-                    with self.sess.as_default():
-                        rho_t = self.rho_t[t_idx].eval()
-                    vr, ir = self.sess.run([val_rho, idx_rho], {query_word: self.dictionary[x], query_rho_t: rho_t})
-                    text_file.write(
-                        "\n\n=====================================\n%s, t = %d\n=====================================" % (
-                        x, t_idx))
-                    for ii in range(num):
-                        text_file.write("\n%-20s %6.4f" % (self.labels[ir[0, ii]], vr[0, ii]))
-
-    def print_word_similarities_test(self, words, num):
-        query_word = tf.placeholder(dtype=tf.int32)
-        query_rho_t = tf.placeholder(dtype=tf.float32)
-        calOnly = 500
-
-        for x in words:
-            f_name = os.path.join(self.logdir, '%s_queries.txt' % (x))
-            with open(f_name, "w+") as text_file:
-                for t_idx in range(self.T):
-                    val_rho, idx_rho = tf.nn.top_k(tf.transpose(tf.matmul(tf.nn.l2_normalize(query_rho_t, axis=1),
-                                                                          tf.nn.l2_normalize(tf.expand_dims(
-                                                                              query_rho_t[self.dictionary[x], :], -1),
-                                                                                             axis=0))), num)
-                    with self.sess.as_default():
-                        rho_t = self.rho_t[t_idx]
-                        print(rho_t.shape)
-                    vr, ir = self.sess.run([val_rho, idx_rho], {query_word: self.dictionary[x], query_rho_t: rho_t})
-                    text_file.write(
-                        "\n\n=====================================\n%s, t = %d\n=====================================" % (
-                        x, t_idx))
-                    for ii in range(num):
-                        text_file.write("\n%-20s %6.4f" % (self.labels[ir[0, ii]], vr[0, ii]))
-
-    def print_topics(self):
-        with self.sess.as_default():
-            print(self.mix_prob.eval())
-            print(self.mean.eval())
-            #print(self.loss.eval())
-
 class MVNCholPrecisionTriL(tfd.TransformedDistribution):
     """MVN from loc and (Cholesky) precision matrix."""
 
@@ -1185,14 +883,15 @@ class GMM_SGAVI(object):
         for k in range(K):
             covs.append(np.linalg.cholesky(w_out[k, :, :]))
         zn = np.array([np.argmax(phi_out[n, :]) for n in range(N)])
+        max_zn = np.array([np.maximum(phi_out[n, :]) for n in range(N)])
         self.pi_out = pi_out
         self.mu_out = m_out
         self.sigma_out = np.stack(covs, axis=0 )
         self.elbo = lbs
         self.assignment = zn
+        self.assignment_likelihood = max_zn
 
 class GMM_HMC(object):
-
     def __init__(self, observations, components = 3, run_steps = 1000, leap_steps = 3, burn_in = 100):
         # Create a mixture of two Gaussians:
         import tensorflow as tf
@@ -1207,22 +906,6 @@ class GMM_HMC(object):
         N, dims = observations.shape
 
         def joint_log_prob(observations, mix_probs, loc, chol_precision):
-            """BGMM with priors: loc=Normal, precision=Inverse-Gamma, mix=Dirichlet.
-
-            Args:
-              observations: `[n, d]`-shaped `Tensor` representing Bayesian Gaussian
-                Mixture model draws. Each sample is a length-`d` vector.
-              mix_probs: `[K]`-shaped `Tensor` representing random draw from
-                `SoftmaxInverse(Dirichlet)` prior.
-              loc: `[K, d]`-shaped `Tensor` representing the location parameter of the
-                `K` components.
-              chol_precision: `[K, d, d]`-shaped `Tensor` representing `K` lower
-                triangular `cholesky(Precision)` matrices, each being sampled from
-                a Wishart distribution.
-
-            Returns:
-              log_prob: `Tensor` representing joint log-density over all inputs.
-            """
             rv_observations = tfd.MixtureSameFamily(
                 mixture_distribution=tfd.Categorical(probs=mix_probs),
                 components_distribution=MVNCholPrecisionTriL(
@@ -1297,11 +980,18 @@ class GMM_HMC(object):
 
             obs = tf.convert_to_tensor(observations)
             c = tf.get_variable("c", [len(observations)], dtype=dtype, initializer=tf.zeros_initializer)
+            c_log = tf.get_variable("c_log", [len(observations)], dtype=dtype, initializer=tf.zeros_initializer)
             # tf.get_variable_scope().reuse_variables()
             condition = lambda i, px: i < len(observations)
 
             def c_assign(i, c):
                 theta = tfd.MultivariateNormalTriL(loc=mean_loc, scale_tril=mean_chol_precision)
+                c_log = tf.get_variable("c_log")
+                c_log = tf.scatter_update(
+                    c_log,
+                    indices=i,
+                    updates=tf.reduce_max(tf.log(mean_mix_probs) + theta.log_prob(obs[i]))
+                )
                 c = tf.get_variable("c")
                 c = tf.scatter_update(
                     c,
@@ -1320,19 +1010,21 @@ class GMM_HMC(object):
             self.pi_out,
             self.mu_out,
             self.sigma_out,
-            self.assignment
+            self.assignment,
+            self.assignment_likelihood
         ] = sess.run([
             acceptance_rate,
             mean_mix_probs,
             mean_loc,
             mean_chol_precision,
-            c
+            c,
+            c_log
         ])
 
-class dynamic_clustering_dynamic_context_bern_emb_model_test(emb_model):
+class dynamic_clustering_dynamic_context_bern_emb_model(emb_model):
     def __init__(self, args, d, logdir):
-        super(dynamic_clustering_dynamic_context_bern_emb_model_test, self).__init__(args, d, logdir)
         import scipy
+        super(dynamic_clustering_dynamic_context_bern_emb_model, self).__init__(args, d, logdir)
         def generate_random_positive_chol_matrix(D, K = 1):
             chol_list = []
             for k in range(K):
@@ -1352,7 +1044,6 @@ class dynamic_clustering_dynamic_context_bern_emb_model_test(emb_model):
                 self.alpha_t[t] = tf.Variable(self.alpha_init
                                               + 0.001 * tf.random_normal([self.L, self.K]) / self.K,
                                               name='alpha_' + str(t))
-            #self.alpha = tf.Variable(self.alpha_init, name='alpha', trainable=self.alpha_trainable)
 
             pi = tfd.Dirichlet(
                 concentration=np.ones(self.components, dtype) /self.components,
@@ -1390,23 +1081,15 @@ class dynamic_clustering_dynamic_context_bern_emb_model_test(emb_model):
                     sigma.log_prob(chol_precision),  # Sum over components.
                 ]
                 sum_log_prob = tf.reduce_sum(tf.concat(log_prob_parts, axis=-1), axis=-1)
-                # Note: for easy debugging, uncomment the following:
-                # sum_log_prob = tf.Print(sum_log_prob, log_prob_parts)
                 return sum_log_prob
-            #self.mcmc_rate = tf.reduce_mean(tf.to_float(kernel_results.inner_results.is_accepted))
             with tf.name_scope('priors'):
                 global_prior = Normal(loc=0.0, scale=self.sig)
                 local_prior = Normal(loc=0.0, scale=self.sig / 100.0)
 
-                # self.log_prior = tf.reduce_sum(global_prior.log_prob(self.alpha))########
                 self.log_prior = tf.reduce_sum(global_prior.log_prob(self.alpha_t[-1]))
                 for t in range(self.T):
                     self.log_prior += tf.reduce_sum(local_prior.log_prob(self.alpha_t[t] - self.alpha_t[t - 1]))
 
-                #self.log_prior += tf.reduce_sum(global_prior.log_prob(self.rho))
-                #self.log_prior += tf.reduce_sum(mu.log_prob(self.mean))
-                #self.log_prior += tf.reduce_sum(sigma.log_prob(self.scale))
-                #self.log_prior += tf.reduce_sum(pi.log_prob(tf.nn.softmax(self.mix_prob)))
         with tf.name_scope('likelihood'):
             self.placeholders = {}
             self.y_pos = {}
@@ -1454,7 +1137,6 @@ class dynamic_clustering_dynamic_context_bern_emb_model_test(emb_model):
                 self.ll_neg += tf.reduce_sum(self.y_neg[t].log_prob(0.0))
             self.log_prob = joint_log_prob(self.rho,tf.nn.softmax(self.mix_prob)
                                                ,self.mean,self.scale)
-
         self.loss = - ((self.ll_pos + self.ll_neg + self.log_prob) + self.log_prior)
 
     def initialize_training(self):
@@ -1491,45 +1173,49 @@ class dynamic_clustering_dynamic_context_bern_emb_model_test(emb_model):
 
 
     def train_embeddings(self):
-        dtype = np.float32
+        import matplotlib.pyplot as plt
+        train_loss_list = []
+
         for data_pass in range(self.n_iter):
             for step in range(self.n_epochs):
-                print(step)
-                if step % 10 == 0 and step > 0:
+                if step % 100 == 0 and step > 0:
                     print(str(step)+'/'+str(self.n_epochs)+'   iter '+str(data_pass))
-                    self.print_topics()
-                    summary,_, train_loss, gmm_loss, rho = self.sess.run([self.summaries, self.train, self.loss, self.log_prob, self.rho], feed_dict=self.train_feed(self.placeholders))
+                    summary,_, train_loss, rho = self.sess.run([self.summaries, self.train, self.loss,self.rho], feed_dict=self.train_feed(self.placeholders))
+                    train_loss_list.append(train_loss)
+                    print("GMM Start")
                     if self.VI:
-                        GMM = GMM_SGAVI(xn=rho, maxIter=1)
+                        self.GMM = GMM_SGAVI(xn=rho, maxIter=1, K=self.components)
                     elif self.HMC:
-                        GMM = GMM_HMC(observations=rho)
-                    print(GMM.sigma_out)
-                    print(GMM.sigma_out.shape)
-                    ass = GMM.assignment
-                    c_ = ass.tolist()
-                    for i in range(self.components):
-                        print(i, c_.count(i))
-                    self.scale =  tf.convert_to_tensor(GMM.sigma_out)
-                    self.mean = tf.convert_to_tensor(GMM.mu_out)
-                    self.mix_prob = tf.convert_to_tensor(GMM.pi_out)
-                    print(train_loss,gmm_loss)
+                        self.GMM = GMM_HMC(observations=rho, components=self.components)
+                    print("GMM Over")
+                    self.scale =  tf.convert_to_tensor(self.GMM.sigma_out)
+                    self.mean = tf.convert_to_tensor(self.GMM.mu_out)
+                    self.mix_prob = tf.convert_to_tensor(self.GMM.pi_out)
                     self.train_writer.add_summary(summary, data_pass*(self.n_epochs) + step)
                 else:
                     self.sess.run([self.train], feed_dict=self.train_feed(self.placeholders))
             self.dump(self.logdir+"/variational"+str(data_pass)+".dat")
             self.saver.save(self.sess, os.path.join(self.logdir, "model.ckpt"), data_pass)
-        self.print_topics()
-        self.print_word_similarities(self.query_words, 10)
+            self.print_topics()
+        self.print_word_similarities_alpha(self.query_words, 10)
         if self.dynamic:
             words = self.detect_drift()
-            self.print_word_similarities(words[:10], 1)
+            self.print_word_similarities_alpha(words[:10], 10)
+        title = "Training Loss over the process"
+        plt.plot(train_loss_list, 'black', label='loss')
+        plt.xlabel("N iteration")
+        plt.ylabel("Training Loss")
+        plt.title(title)
+        # save image
+        plt.savefig(title + ".png")
         self.plot_params(500)
+        #print(self.eval_log_like(feed_dict=self.test_feed(self.placeholders)))
 
     def dump(self, fname):
         with self.sess.as_default():
-            dat = {'alpha': self.alpha.eval()}
+            dat = {'rho': self.rho.eval()}
             for t in range(self.T):
-                dat['rho_' + str(t)] = self.rho_t[t].eval()
+                dat['alpha_' + str(t)] =  self.alpha_t[t].eval()
         pickle.dump(dat, open(fname, "wb"))
 
     def eval_log_like(self, feed_dict):
@@ -1542,18 +1228,18 @@ class dynamic_clustering_dynamic_context_bern_emb_model_test(emb_model):
     def plot_params(self, plot_only=500):
         with self.sess.as_default():
             tsne = TSNE(perplexity=30, n_components=2, init='pca', n_iter=5000)
-            low_dim_embs_alpha = tsne.fit_transform(self.alpha.eval()[:plot_only])
-            plot_with_labels(low_dim_embs_alpha[:plot_only], self.labels[:plot_only], self.logdir + '/alpha.eps')
+            low_dim_embs_rho = tsne.fit_transform(self.rho.eval()[:plot_only])
+            plot_with_labels(low_dim_embs_rho[:plot_only], self.labels[:plot_only], self.logdir + '/rho.eps')
             for t in [0, int(self.T / 2), self.T - 1]:
                 w_idx_t = range(plot_only)
-                np_rho = self.rho_t[t].eval()
+                np_alpha = self.alpha_t[t].eval()
                 tsne = TSNE(perplexity=30, n_components=2, init='pca', n_iter=5000)
-                low_dim_embs_rho = tsne.fit_transform(np_rho[w_idx_t, :])
-                plot_with_labels(low_dim_embs_rho, self.labels[w_idx_t], self.logdir + '/rho_' + str(t) + '.eps')
+                low_dim_embs_alpha = tsne.fit_transform(np_alpha[w_idx_t, :])
+                plot_with_labels(low_dim_embs_alpha, self.labels[w_idx_t], self.logdir + '/alpha_' + str(t) + '.eps')
 
     def detect_drift(self, metric='total_dist'):
         if metric == 'total_dist':
-            tf_dist, tf_w_idx = tf.nn.top_k(tf.reduce_sum(tf.square(self.rho_t[self.T - 1] - self.rho_t[0]), 1), 500)
+            tf_dist, tf_w_idx = tf.nn.top_k(tf.reduce_sum(tf.square(self.alpha_t[self.T - 1] - self.alpha_t[0]), 1), 500)
         else:
             print('unknown metric')
             return
@@ -1565,44 +1251,21 @@ class dynamic_clustering_dynamic_context_bern_emb_model_test(emb_model):
                 text_file.write("\n%-20s %6.4f" % (self.labels[w], drift))
         return words
 
-    def print_word_similarities(self, words, num):
+    def print_word_similarities_alpha(self, words, num):
         query_word = tf.placeholder(dtype=tf.int32)
-        query_rho_t = tf.placeholder(dtype=tf.float32)
+        query_alpha_t = tf.placeholder(dtype=tf.float32)
 
         val_rho, idx_rho = tf.nn.top_k(
-            tf.matmul(tf.nn.l2_normalize(query_rho_t, dim=0), tf.nn.l2_normalize(self.alpha, dim=1), transpose_b=True),
+            tf.matmul(tf.nn.l2_normalize(self.rho, dim=0), tf.nn.l2_normalize(query_alpha_t, dim=1), transpose_b=True),
             num)
 
         for x in words:
-            f_name = os.path.join(self.logdir, '%s_queries.txt' % (x))
+            f_name = os.path.join(self.logdir, '%s_queries_alpha.txt' % (x))
             with open(f_name, "w+") as text_file:
                 for t_idx in range(self.T):
                     with self.sess.as_default():
-                        rho_t = self.rho_t[t_idx].eval()
-                    vr, ir = self.sess.run([val_rho, idx_rho], {query_word: self.dictionary[x], query_rho_t: rho_t})
-                    text_file.write(
-                        "\n\n=====================================\n%s, t = %d\n=====================================" % (
-                        x, t_idx))
-                    for ii in range(num):
-                        text_file.write("\n%-20s %6.4f" % (self.labels[ir[0, ii]], vr[0, ii]))
-
-    def print_word_similarities_test(self, words, num):
-        query_word = tf.placeholder(dtype=tf.int32)
-        query_rho_t = tf.placeholder(dtype=tf.float32)
-        calOnly = 500
-
-        for x in words:
-            f_name = os.path.join(self.logdir, '%s_queries.txt' % (x))
-            with open(f_name, "w+") as text_file:
-                for t_idx in range(self.T):
-                    val_rho, idx_rho = tf.nn.top_k(tf.transpose(tf.matmul(tf.nn.l2_normalize(query_rho_t, axis=1),
-                                                                          tf.nn.l2_normalize(tf.expand_dims(
-                                                                              query_rho_t[self.dictionary[x], :], -1),
-                                                                                             axis=0))), num)
-                    with self.sess.as_default():
-                        rho_t = self.rho_t[t_idx]
-                        print(rho_t.shape)
-                    vr, ir = self.sess.run([val_rho, idx_rho], {query_word: self.dictionary[x], query_rho_t: rho_t})
+                        alpha_t = self.alpha_t[t_idx].eval()
+                    vr, ir = self.sess.run([val_rho, idx_rho], {query_word: self.dictionary[x], query_alpha_t: alpha_t})
                     text_file.write(
                         "\n\n=====================================\n%s, t = %d\n=====================================" % (
                         x, t_idx))
@@ -1611,275 +1274,20 @@ class dynamic_clustering_dynamic_context_bern_emb_model_test(emb_model):
 
     def print_topics(self):
         with self.sess.as_default():
-            print(self.mix_prob.eval())
-            print(self.mean.eval())
-            #print(self.scale_tril.eval())
-            #print(self.loss.eval())
-
-class dynamic_clustering_bern_emb_model(emb_model):
-    def __init__(self, args, d, logdir):
-        super(dynamic_clustering_bern_emb_model, self).__init__(args, d, logdir)
-        self.n_minibatch = self.n_minibatch.sum()
-        dims = self.K
-        components = 5
-        dtype = np.float32
-
-        with tf.name_scope('model'):
-            self.alpha = tf.Variable(self.alpha_init, name='alpha')
-            self.rho = tf.Variable(self.rho_init, name='rho')
-            pi = tfd.Dirichlet(
-                concentration=np.ones(components, dtype) * 1e7,
-                name='pi_dist')
-
-            mu = tfd.Independent(
-                tfd.Normal(
-                    loc=np.stack([np.zeros(dims, dtype)] * components),
-                    scale=tf.ones([components, dims], dtype)),
-                reinterpreted_batch_ndims=1,
-                name='mu_dist')
-
-            sigma = tfd.Wishart(
-                df=dims,
-                scale_tril=np.stack([np.eye(dims, dtype=dtype)] * components),
-                input_output_cholesky=True,
-                name='sigma_dist')
-
-            def joint_log_prob(observations, mix_probs, loc, chol_precision):
-                rv_observations = tfd.MixtureSameFamily(
-                    mixture_distribution=tfd.Categorical(probs=mix_probs),
-                    components_distribution=tfd.MultivariateNormalTriL(
-                        loc=loc,
-                        scale_tril=chol_precision))
-                log_prob_parts = [
-                    rv_observations.log_prob(observations),  # Sum over samples.
-                    pi.log_prob(mix_probs)[..., tf.newaxis],
-                    mu.log_prob(loc),  # Sum over components.
-                    sigma.log_prob(chol_precision),  # Sum over components.
-                ]
-                sum_log_prob = tf.reduce_sum(tf.concat(log_prob_parts, axis=-1), axis=-1)
-                # Note: for easy debugging, uncomment the following:
-                # sum_log_prob = tf.Print(sum_log_prob, log_prob_parts)
-                return sum_log_prob
-            initial_state = [
-                tf.fill([components],
-                        value=np.array(1. / components, dtype),
-                        name='mix_probs'),
-                tf.constant(np.stack([np.zeros(dims, dtype)] * components),
-                            name='mu'),
-                tf.eye(dims, batch_shape=[components], dtype=dtype, name='chol_precision'),
-            ]
-            unconstraining_bijectors = [
-                tfb.SoftmaxCentered(),
-                tfb.Identity(),
-                tfb.Chain([
-                    tfb.TransformDiagonal(tfb.Softplus()),
-                    tfb.FillTriangular(),
-                ])]
-            mcstep_size = tf.get_variable(
-                name='step_size',
-                initializer=np.array(5. ** -7, dtype),
-                use_resource=True,
-                trainable=False)
-            unnormalized_posterior_log_prob = functools.partial(joint_log_prob, self.rho)
-            [mix_probs, loc, chol_precision], kernel_results = tfp.mcmc.sample_chain(
-                num_results=30,
-                num_burnin_steps=0,
-                current_state=initial_state,
-                kernel=tfp.mcmc.TransformedTransitionKernel(
-                    inner_kernel=tfp.mcmc.HamiltonianMonteCarlo(
-                        target_log_prob_fn=unnormalized_posterior_log_prob,
-                        step_size=mcstep_size,
-                        step_size_update_fn=tfp.mcmc.make_simple_step_size_update_policy(),
-                        num_leapfrog_steps=3),
-                    bijector=unconstraining_bijectors))
-            self.mix_prob = tf.reduce_mean(mix_probs, axis=0)
-            self.mean =  tf.reduce_mean(loc, axis=0)
-            self.scale = tf.reduce_mean(chol_precision, axis=0)
-            self.mcmc_rate = tf.reduce_mean(tf.to_float(kernel_results.inner_results.is_accepted))
-            with tf.name_scope('priors'):
-                global_prior = Normal(loc=0.0, scale=self.sig)
-                local_prior = Normal(loc=0.0, scale=self.sig / 100.0)
-
-                self.log_prior = tf.reduce_sum(global_prior.log_prob(self.alpha))
-                self.log_prior += tf.reduce_sum(mu.log_prob(self.mean))
-                self.log_prior += tf.reduce_sum(sigma.log_prob(self.scale))
-                self.log_prior += tf.reduce_sum(pi.log_prob(self.mix_prob))
-
-            with tf.name_scope('input'):
-                self.placeholders = tf.placeholder(tf.int32)
-                self.words = self.placeholders
-            # Index Masks
-            with tf.name_scope('context_mask'):
-                self.p_mask = tf.cast(tf.range(int(self.cs/2), self.n_minibatch + int(self.cs/2)),tf.int32)
-                rows = tf.cast(tf.tile(tf.expand_dims(tf.range(0, int(self.cs/2)),[0]), [self.n_minibatch, 1]),tf.int32)
-                columns = tf.cast(tf.tile(tf.expand_dims(tf.range(0, self.n_minibatch), [1]), [1, int(self.cs/2)]),tf.int32)
-                self.ctx_mask = tf.concat([rows+columns, rows+columns +int(self.cs/2)+1], 1)
-            with tf.name_scope('natural_param'):
-                # Taget and Context Indices
-                with tf.name_scope('target_word'):
-                    self.p_idx = tf.gather(self.words, self.p_mask)
-                    self.p_rho = tf.squeeze(tf.gather(self.rho, self.p_idx))
-
-                # Negative samples
-                with tf.name_scope('negative_samples'):
-                    unigram_logits = tf.tile(tf.expand_dims(tf.log(tf.constant(self.unigram)), [0]), [self.n_minibatch, 1])
-                    self.n_idx = tf.multinomial(unigram_logits, self.ns)
-                    self.n_rho = tf.gather(self.rho, self.n_idx)
-
-                with tf.name_scope('context'):
-                    self.ctx_idx = tf.squeeze(tf.gather(self.words, self.ctx_mask))
-                    self.ctx_alphas = tf.gather(self.alpha, self.ctx_idx)
-
-
-                # Natural parameter
-                ctx_sum = tf.reduce_sum(self.ctx_alphas,[1])
-                self.p_eta = tf.expand_dims(tf.reduce_sum(tf.multiply(self.p_rho, ctx_sum),-1),1)
-                self.n_eta = tf.reduce_sum(tf.multiply(self.n_rho, tf.tile(tf.expand_dims(ctx_sum,1),[1,self.ns,1])),-1)
-
-            self.y_pos = Bernoulli(logits=self.p_eta)
-            self.y_neg = Bernoulli(logits=self.n_eta)
-
-            self.ll_pos = tf.reduce_sum(self.y_pos.log_prob(1.0))
-            self.ll_neg = tf.reduce_sum(self.y_neg.log_prob(0.0))
-            self.log_prob = joint_log_prob(self.rho, self.mix_prob, self.mean, self.scale)
-
-            self.log_likelihood = self.ll_pos + self.ll_neg + self.log_prob
-            self.loss = - ((self.ll_pos + self.ll_neg + self.log_prob) + self.log_prior)
-
-    def initialize_training(self):
-        optimizer = tf.train.AdamOptimizer()
-        self.train = optimizer.minimize(self.loss)
-        self.sess = tf.Session()
-        with self.sess.as_default():
-            tf.global_variables_initializer().run()
-
-        variable_summaries('alpha', self.alpha)
-        with tf.name_scope('objective'):
-            tf.summary.scalar('loss', self.loss)
-            tf.summary.scalar('priors', self.log_prior)
-            tf.summary.scalar('ll_pos', self.ll_pos)
-            tf.summary.scalar('ll_neg', self.ll_neg)
-        self.summaries = tf.summary.merge_all()
-        self.train_writer = tf.summary.FileWriter(self.logdir, self.sess.graph)
-        self.saver = tf.train.Saver()
-        config = projector.ProjectorConfig()
-        alpha = config.embeddings.add()
-        alpha.tensor_name = 'model/embeddings/alpha'
-        alpha.metadata_path = '../vocab.tsv'
-        rho = config.embeddings.add()
-        rho.tensor_name = 'model/embeddings/rho'
-        rho.metadata_path = '../vocab.tsv'
-        projector.visualize_embeddings(self.train_writer, config)
-
-
-    def train_embeddings(self):
-        for data_pass in range(self.n_iter):
-            for step in range(self.n_epochs):
-                if step % 10 == 0:
-                    print(str(step)+'/'+str(self.n_epochs)+'   iter '+str(data_pass))
-                    #self.print_topics()
-                    summary,_ = self.sess.run([self.summaries, self.train], feed_dict=self.train_feed(self.placeholders))
-                    self.train_writer.add_summary(summary, data_pass*(self.n_epochs) + step)
-                else:
-                    self.sess.run([self.train], feed_dict=self.train_feed(self.placeholders))
-            self.dump(self.logdir+"/variational"+str(data_pass)+".dat")
-            self.saver.save(self.sess, os.path.join(self.logdir, "model.ckpt"), data_pass)
-        self.print_topics()
-        self.print_word_similarities(self.query_words, 10)
-        if self.dynamic:
-            words = self.detect_drift()
-            self.print_word_similarities(words[:10], 1)
-        self.plot_params(500)
-
-    def dump(self, fname):
-        with self.sess.as_default():
-            dat = {'alpha': self.alpha.eval()}
-            for t in range(self.T):
-                dat['rho_' + str(t)] = self.rho_t[t].eval()
-        pickle.dump(dat, open(fname, "wb"))
-
-    def eval_log_like(self, feed_dict):
-        log_p = np.zeros((0, 1))
-        for t in range(self.T):
-            log_p_t = self.sess.run(tf.log(self.y_pos[t].mean() + 0.000001), feed_dict=feed_dict)
-            log_p = np.vstack((log_p, log_p_t))
-        return log_p
-
-    def plot_params(self, plot_only=500):
-        with self.sess.as_default():
-            tsne = TSNE(perplexity=30, n_components=2, init='pca', n_iter=5000)
-            low_dim_embs_alpha = tsne.fit_transform(self.alpha.eval()[:plot_only])
-            plot_with_labels(low_dim_embs_alpha[:plot_only], self.labels[:plot_only], self.logdir + '/alpha.eps')
-            for t in [0, int(self.T / 2), self.T - 1]:
-                w_idx_t = range(plot_only)
-                np_rho = self.rho_t[t].eval()
-                tsne = TSNE(perplexity=30, n_components=2, init='pca', n_iter=5000)
-                low_dim_embs_rho = tsne.fit_transform(np_rho[w_idx_t, :])
-                plot_with_labels(low_dim_embs_rho, self.labels[w_idx_t], self.logdir + '/rho_' + str(t) + '.eps')
-
-    def detect_drift(self, metric='total_dist'):
-        if metric == 'total_dist':
-            tf_dist, tf_w_idx = tf.nn.top_k(tf.reduce_sum(tf.square(self.rho_t[self.T - 1] - self.rho_t[0]), 1), 500)
-        else:
-            print('unknown metric')
-            return
-        dist, w_idx = self.sess.run([tf_dist, tf_w_idx])
-        words = self.labels[w_idx]
-        f_name = self.logdir + '/top_drifting_words.txt'
-        with open(f_name, "w+") as text_file:
-            for (w, drift) in zip(w_idx, dist):
-                text_file.write("\n%-20s %6.4f" % (self.labels[w], drift))
-        return words
-
-    def print_word_similarities(self, words, num):
-        query_word = tf.placeholder(dtype=tf.int32)
-        query_rho_t = tf.placeholder(dtype=tf.float32)
-
-        val_rho, idx_rho = tf.nn.top_k(
-            tf.matmul(tf.nn.l2_normalize(query_rho_t, dim=0), tf.nn.l2_normalize(self.alpha, dim=1), transpose_b=True),
-            num)
-
-        for x in words:
-            f_name = os.path.join(self.logdir, '%s_queries.txt' % (x))
-            with open(f_name, "w+") as text_file:
-                for t_idx in range(self.T):
-                    with self.sess.as_default():
-                        rho_t = self.rho_t[t_idx].eval()
-                    vr, ir = self.sess.run([val_rho, idx_rho], {query_word: self.dictionary[x], query_rho_t: rho_t})
-                    text_file.write(
-                        "\n\n=====================================\n%s, t = %d\n=====================================" % (
-                        x, t_idx))
-                    for ii in range(num):
-                        text_file.write("\n%-20s %6.4f" % (self.labels[ir[0, ii]], vr[0, ii]))
-
-    def print_word_similarities_test(self, words, num):
-        query_word = tf.placeholder(dtype=tf.int32)
-        query_rho_t = tf.placeholder(dtype=tf.float32)
-        calOnly = 500
-
-        for x in words:
-            f_name = os.path.join(self.logdir, '%s_queries.txt' % (x))
-            with open(f_name, "w+") as text_file:
-                for t_idx in range(self.T):
-                    val_rho, idx_rho = tf.nn.top_k(tf.transpose(tf.matmul(tf.nn.l2_normalize(query_rho_t, axis=1),
-                                                                          tf.nn.l2_normalize(tf.expand_dims(
-                                                                              query_rho_t[self.dictionary[x], :], -1),
-                                                                                             axis=0))), num)
-                    with self.sess.as_default():
-                        rho_t = self.rho_t[t_idx]
-                        print(rho_t.shape)
-                    vr, ir = self.sess.run([val_rho, idx_rho], {query_word: self.dictionary[x], query_rho_t: rho_t})
-                    text_file.write(
-                        "\n\n=====================================\n%s, t = %d\n=====================================" % (
-                        x, t_idx))
-                    for ii in range(num):
-                        text_file.write("\n%-20s %6.4f" % (self.labels[ir[0, ii]], vr[0, ii]))
-
-    def print_topics(self):
-        with self.sess.as_default():
-            print(self.mix_prob.eval())
-            print(self.mean.eval())
-            #print(self.loss.eval())
+            ass = self.GMM.assignment
+            ass_likelihood = self.GMM.assignment_likelihood
+            c_ = ass.tolist()
+            cl_ = ass_likelihood.tolist()
+            c_ = [x for _, x in sorted(zip(cl_, c_), reverse=True)]
+            for i in range(self.components):
+                word_list = []
+                for j in range(self.L):
+                    if c_[j] == i:
+                        word_list.append(self.labels[j])
+                file_name = "./topic_" + str(i) + ".txt"
+                with open(file_name, 'w') as f:
+                    for item in word_list:
+                        f.write("%s\n" % item)
 
 
 def define_model(args, d, logdir):
@@ -1906,9 +1314,12 @@ def define_model(args, d, logdir):
         sess = tf.InteractiveSession(config=config)
 
     reset_sess()
+
     if args.dynamic:
-        m = dynamic_clustering_dynamic_context_bern_emb_model_test(args, d, logdir)
-        #m = dynamic_context_dynamic_bern_emb_model(args, d, logdir)
+        if args.dclustering:
+            m = dynamic_clustering_dynamic_context_bern_emb_model(args, d, logdir)
+            return m
+        m = dynamic_bern_emb_model(args, d, logdir)
     else:
-        m = dynamic_clustering_bern_emb_model(args, d, logdir)
+        m = bern_emb_model(args, d, logdir)
     return m

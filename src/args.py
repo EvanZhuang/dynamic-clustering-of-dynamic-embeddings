@@ -24,19 +24,25 @@ def parse_args():
         parser.add_argument('--dynamic', type=bool, default=False,
                             help='Dynamics on rho. Default is False.')
 
-        parser.add_argument('--VI', type=bool, default=False,
-                            help='Dynamics on rho. Default is False.')
+        parser.add_argument('--dclustering', type=bool, default=False,
+                            help='Clustering on rho. Default is False.')
 
-        parser.add_argument('--HMC', type=bool, default=False,
-                            help='Dynamics on rho. Default is False.')
+        parser.add_argument('--VI', type=bool, default=False,
+                            help='Use VI for GMM. Default is False.')
+
+        parser.add_argument('--HMC', type=bool, default=True,
+                            help='Use HMC for GMM. Default is True.')
 
         parser.add_argument('--components', type=int, default=3,
-                            help='Context size. Default is 4.')
+                            help='Number of components. Default is 3.')
+
+        parser.add_argument('--run_steps', type=int, default=1000,
+                            help='Number of steps for HMC. Default is 1000.')
+
+        parser.add_argument('--burnin_steps', type=int, default=100,
+                            help='Number of components. Default is 3.')
 
         parser.add_argument('--init', type=str, default='',
-                            help='Folder name to load variational.dat for initialization. Default is \'\' for no initialization')
-
-        parser.add_argument('--dinit', type=str, default='',
                             help='Folder name to load variational.dat for initialization. Default is \'\' for no initialization')
 
         parser.add_argument('--fpath', type=str, default='../dat/arxiv_ML/',

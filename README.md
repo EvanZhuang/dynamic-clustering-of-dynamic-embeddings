@@ -1,11 +1,11 @@
 ### Dynamic Bernoulli Embeddings for Language Evolution
 
-This repository contains scripts for running (dynamic) Bernoulli embeddings on text data.
+This repository contains scripts for running (dynamic) Bernoulli embeddings with dynamic clustering on text data.
 They have been run and tested on Linux. 
 
 To execute, go into the source folder (`src/`) and run 
 
-   ```python main.py --dynamic True --fpath [path/to/data]```
+   ```python main.py --dynamic True --dclustering True --fpath [path/to/data]```
 
 substitute the path to the folder where you put the data for `[path/to/data]`.
 The data folder and files have to be structured in a specific format.
@@ -26,6 +26,15 @@ This executes Bernoulli embeddings without dynamics. The scripts uses the curren
 
 Make sure to use the same `--K` for both runs.
 
+We have two inference methods implemented for the GMM, Hamiltonian Monte Carlo and Stochastic Gradient Descent Variational Inference. 
+
+Hamiltonian Monte Carlo
+
+```python main.py --dynamic True --dclustering True --HMC True --fpath [path/to/data]```
+
+Or Stochastic Gradient Descent Variational Inference
+
+```python main.py --dynamic True --dclustering True --VI True --fpath [path/to/data]```
 
 ### Reference
 Maja Rudolph and David Blei, 2017. [Dynamic Bernoulli Embeddings for Language Evolution](https://arxiv.org/abs/1703.08052).
