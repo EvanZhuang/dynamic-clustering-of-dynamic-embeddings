@@ -2,18 +2,19 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import numpy as np
-import os
-import pickle
-import tensorflow as tf
-import time
+# import numpy as np
+# import os
+# import pickle
+# import tensorflow as tf
+# import time
 
 from data import *
 from models import *
 from args import *
 from utils import *
 
-qList = ['chinese', 'immigrant', 'immigration', 'political', 'communist', 'party', 'mao']
+qList = ['chinese', 'immigrant', 'immigration',
+         'political', 'communist', 'party', 'mao']
 
 args = parse_args()
 
