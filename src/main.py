@@ -8,10 +8,10 @@ from __future__ import print_function
 # import tensorflow as tf
 # import time
 
-from data import *
-from models import *
-from args import *
-from utils import *
+from data import bern_emb_data
+from models import define_model
+from args import parse_args
+from utils import make_dir
 
 
 args = parse_args()
