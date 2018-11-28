@@ -1,0 +1,1 @@
+Namespace(HMC=True, K=50, VI=False, burnin_steps=100, components=3, cs=4, dclustering=False, dynamic=True, fpath='/home/yufan/PycharmProjects/dynamic-clustering-of-dynamic-embeddings/dat/debate_by_year', init='', n_epochs=5000, n_iter=1, ns=10, run_steps=1000, sig=1.0)

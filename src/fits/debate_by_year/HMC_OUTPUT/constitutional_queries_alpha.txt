@@ -1,0 +1,645 @@
+
+
+=====================================
+constitutional, t = 0
+=====================================
+copper               0.0035
+culturally           0.0034
+counterproductive    0.0034
+spectacular          0.0034
+kissinger            0.0033
+uncertainties        0.0033
+weaponry             0.0033
+revised              0.0033
+tree                 0.0032
+merciless            0.0032
+
+=====================================
+constitutional, t = 1
+=====================================
+copper               0.0035
+spectacular          0.0034
+culturally           0.0034
+counterproductive    0.0034
+kissinger            0.0033
+uncertainties        0.0033
+weaponry             0.0033
+revised              0.0032
+tree                 0.0032
+flout                0.0032
+
+=====================================
+constitutional, t = 2
+=====================================
+copper               0.0035
+culturally           0.0034
+spectacular          0.0034
+counterproductive    0.0034
+kissinger            0.0033
+uncertainties        0.0033
+weaponry             0.0033
+tree                 0.0032
+revised              0.0032
+flout                0.0032
+
+=====================================
+constitutional, t = 3
+=====================================
+romanian             0.0044
+copper               0.0035
+culturally           0.0034
+spectacular          0.0034
+counterproductive    0.0034
+weaponry             0.0033
+uncertainties        0.0033
+kissinger            0.0033
+tree                 0.0032
+flout                0.0032
+
+=====================================
+constitutional, t = 4
+=====================================
+copper               0.0035
+culturally           0.0034
+counterproductive    0.0034
+spectacular          0.0033
+weaponry             0.0033
+uncertainties        0.0033
+kissinger            0.0033
+romanian             0.0033
+flout                0.0032
+tree                 0.0032
+
+=====================================
+constitutional, t = 5
+=====================================
+copper               0.0035
+culturally           0.0034
+counterproductive    0.0034
+kissinger            0.0033
+weaponry             0.0033
+uncertainties        0.0033
+flout                0.0032
+spectacular          0.0032
+tree                 0.0032
+callous              0.0032
+
+=====================================
+constitutional, t = 6
+=====================================
+copper               0.0035
+culturally           0.0034
+counterproductive    0.0034
+weaponry             0.0033
+kissinger            0.0033
+uncertainties        0.0033
+tree                 0.0032
+flout                0.0032
+callous              0.0032
+merciless            0.0032
+
+=====================================
+constitutional, t = 7
+=====================================
+copper               0.0035
+culturally           0.0034
+counterproductive    0.0034
+weaponry             0.0033
+kissinger            0.0033
+uncertainties        0.0032
+tree                 0.0032
+callous              0.0032
+flout                0.0032
+merciless            0.0032
+
+=====================================
+constitutional, t = 8
+=====================================
+copper               0.0035
+culturally           0.0034
+counterproductive    0.0034
+weaponry             0.0033
+kissinger            0.0033
+flout                0.0032
+uncertainties        0.0032
+tree                 0.0032
+callous              0.0032
+merciless            0.0032
+
+=====================================
+constitutional, t = 9
+=====================================
+copper               0.0035
+culturally           0.0034
+counterproductive    0.0034
+weaponry             0.0033
+kissinger            0.0033
+tree                 0.0032
+callous              0.0032
+flout                0.0032
+preliminary          0.0031
+uncertainties        0.0031
+
+=====================================
+constitutional, t = 10
+=====================================
+copper               0.0035
+culturally           0.0034
+counterproductive    0.0034
+weaponry             0.0033
+kissinger            0.0033
+accomplis            0.0032
+flout                0.0032
+merciless            0.0032
+tree                 0.0032
+callous              0.0032
+
+=====================================
+constitutional, t = 11
+=====================================
+copper               0.0035
+culturally           0.0034
+counterproductive    0.0034
+weaponry             0.0033
+kissinger            0.0032
+preliminary          0.0032
+merciless            0.0032
+callous              0.0032
+tree                 0.0032
+flout                0.0032
+
+=====================================
+constitutional, t = 12
+=====================================
+copper               0.0035
+culturally           0.0034
+counterproductive    0.0034
+weaponry             0.0033
+kissinger            0.0032
+accomplis            0.0032
+preliminary          0.0032
+callous              0.0032
+tree                 0.0032
+flout                0.0032
+
+=====================================
+constitutional, t = 13
+=====================================
+copper               0.0035
+culturally           0.0035
+counterproductive    0.0034
+weaponry             0.0033
+kissinger            0.0032
+preliminary          0.0032
+flout                0.0032
+revised              0.0032
+callous              0.0032
+tree                 0.0032
+
+=====================================
+constitutional, t = 14
+=====================================
+copper               0.0035
+culturally           0.0035
+counterproductive    0.0034
+weaponry             0.0033
+preliminary          0.0033
+revised              0.0032
+kissinger            0.0032
+flout                0.0032
+callous              0.0032
+tree                 0.0032
+
+=====================================
+constitutional, t = 15
+=====================================
+copper               0.0035
+culturally           0.0035
+counterproductive    0.0034
+weaponry             0.0033
+preliminary          0.0033
+revised              0.0032
+kissinger            0.0032
+callous              0.0032
+flout                0.0032
+tree                 0.0032
+
+=====================================
+constitutional, t = 16
+=====================================
+copper               0.0035
+culturally           0.0035
+counterproductive    0.0034
+weaponry             0.0033
+revised              0.0033
+preliminary          0.0032
+callous              0.0032
+kissinger            0.0032
+justifiable          0.0032
+flout                0.0032
+
+=====================================
+constitutional, t = 17
+=====================================
+copper               0.0035
+culturally           0.0035
+counterproductive    0.0034
+preliminary          0.0033
+revised              0.0033
+callous              0.0032
+weaponry             0.0032
+kissinger            0.0032
+flout                0.0032
+justifiable          0.0032
+
+=====================================
+constitutional, t = 18
+=====================================
+copper               0.0035
+culturally           0.0035
+counterproductive    0.0034
+revised              0.0033
+preliminary          0.0033
+callous              0.0032
+flout                0.0032
+justifiable          0.0032
+kissinger            0.0032
+weaponry             0.0031
+
+=====================================
+constitutional, t = 19
+=====================================
+copper               0.0035
+culturally           0.0035
+counterproductive    0.0034
+revised              0.0033
+preliminary          0.0033
+weaponry             0.0032
+callous              0.0032
+flout                0.0032
+kissinger            0.0031
+justifiable          0.0031
+
+=====================================
+constitutional, t = 20
+=====================================
+copper               0.0035
+culturally           0.0035
+counterproductive    0.0034
+revised              0.0033
+preliminary          0.0033
+weaponry             0.0032
+callous              0.0032
+flout                0.0032
+tree                 0.0031
+kissinger            0.0031
+
+=====================================
+constitutional, t = 21
+=====================================
+copper               0.0035
+culturally           0.0035
+counterproductive    0.0034
+weaponry             0.0033
+preliminary          0.0033
+revised              0.0032
+callous              0.0032
+flout                0.0032
+tree                 0.0031
+justifiable          0.0031
+
+=====================================
+constitutional, t = 22
+=====================================
+copper               0.0035
+culturally           0.0035
+counterproductive    0.0034
+weaponry             0.0034
+preliminary          0.0032
+revised              0.0032
+callous              0.0032
+flout                0.0032
+tree                 0.0031
+justifiable          0.0031
+
+=====================================
+constitutional, t = 23
+=====================================
+copper               0.0035
+culturally           0.0035
+weaponry             0.0034
+counterproductive    0.0034
+preliminary          0.0032
+revised              0.0032
+callous              0.0032
+flout                0.0032
+tree                 0.0031
+justifiable          0.0031
+
+=====================================
+constitutional, t = 24
+=====================================
+culturally           0.0035
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+preliminary          0.0033
+revised              0.0032
+callous              0.0032
+flout                0.0032
+tree                 0.0031
+romanian             0.0031
+
+=====================================
+constitutional, t = 25
+=====================================
+culturally           0.0035
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+preliminary          0.0033
+callous              0.0032
+revised              0.0032
+flout                0.0031
+tree                 0.0031
+romanian             0.0031
+
+=====================================
+constitutional, t = 26
+=====================================
+culturally           0.0035
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+preliminary          0.0033
+callous              0.0032
+revised              0.0032
+flout                0.0031
+tree                 0.0031
+romanian             0.0031
+
+=====================================
+constitutional, t = 27
+=====================================
+culturally           0.0035
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+preliminary          0.0032
+callous              0.0032
+revised              0.0032
+flout                0.0031
+tree                 0.0031
+fledgling            0.0031
+
+=====================================
+constitutional, t = 28
+=====================================
+culturally           0.0035
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+preliminary          0.0032
+callous              0.0032
+revised              0.0032
+flout                0.0031
+fledgling            0.0031
+tree                 0.0031
+
+=====================================
+constitutional, t = 29
+=====================================
+culturally           0.0035
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+callous              0.0032
+preliminary          0.0032
+revised              0.0032
+flout                0.0031
+tree                 0.0031
+fledgling            0.0031
+
+=====================================
+constitutional, t = 30
+=====================================
+culturally           0.0035
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+callous              0.0032
+preliminary          0.0032
+revised              0.0032
+flout                0.0031
+hollow               0.0031
+tree                 0.0031
+
+=====================================
+constitutional, t = 31
+=====================================
+culturally           0.0035
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+callous              0.0032
+preliminary          0.0032
+revised              0.0032
+flout                0.0031
+hollow               0.0031
+tree                 0.0031
+
+=====================================
+constitutional, t = 32
+=====================================
+culturally           0.0036
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+callous              0.0032
+preliminary          0.0032
+revised              0.0032
+uncertainties        0.0032
+hollow               0.0031
+flout                0.0031
+
+=====================================
+constitutional, t = 33
+=====================================
+culturally           0.0036
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+callous              0.0032
+preliminary          0.0032
+uncertainties        0.0032
+revised              0.0032
+hollow               0.0031
+flout                0.0031
+
+=====================================
+constitutional, t = 34
+=====================================
+culturally           0.0036
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+uncertainties        0.0033
+callous              0.0032
+preliminary          0.0032
+revised              0.0032
+hollow               0.0031
+flout                0.0031
+
+=====================================
+constitutional, t = 35
+=====================================
+culturally           0.0036
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+revised              0.0033
+preliminary          0.0033
+callous              0.0032
+uncertainties        0.0032
+losses               0.0032
+hollow               0.0031
+
+=====================================
+constitutional, t = 36
+=====================================
+culturally           0.0036
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+revised              0.0033
+uncertainties        0.0033
+preliminary          0.0033
+callous              0.0033
+losses               0.0032
+hollow               0.0031
+
+=====================================
+constitutional, t = 37
+=====================================
+culturally           0.0036
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+callous              0.0033
+preliminary          0.0032
+losses               0.0032
+uncertainties        0.0032
+hollow               0.0031
+flout                0.0031
+
+=====================================
+constitutional, t = 38
+=====================================
+culturally           0.0036
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+losses               0.0033
+uncertainties        0.0033
+callous              0.0033
+preliminary          0.0032
+hollow               0.0031
+flout                0.0031
+
+=====================================
+constitutional, t = 39
+=====================================
+culturally           0.0036
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+callous              0.0033
+losses               0.0033
+preliminary          0.0032
+revised              0.0032
+uncertainties        0.0032
+hollow               0.0031
+
+=====================================
+constitutional, t = 40
+=====================================
+culturally           0.0036
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+losses               0.0033
+revised              0.0033
+callous              0.0033
+preliminary          0.0032
+uncertainties        0.0032
+hollow               0.0031
+
+=====================================
+constitutional, t = 41
+=====================================
+culturally           0.0036
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+losses               0.0033
+uncertainties        0.0033
+callous              0.0033
+preliminary          0.0032
+revised              0.0032
+hollow               0.0031
+
+=====================================
+constitutional, t = 42
+=====================================
+culturally           0.0036
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+losses               0.0033
+callous              0.0033
+preliminary          0.0032
+uncertainties        0.0032
+revised              0.0031
+hollow               0.0031
+
+=====================================
+constitutional, t = 43
+=====================================
+culturally           0.0036
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+losses               0.0033
+preliminary          0.0033
+callous              0.0033
+uncertainties        0.0032
+revised              0.0031
+hollow               0.0031
+
+=====================================
+constitutional, t = 44
+=====================================
+culturally           0.0036
+copper               0.0035
+counterproductive    0.0034
+losses               0.0033
+weaponry             0.0033
+callous              0.0033
+preliminary          0.0032
+uncertainties        0.0032
+revised              0.0031
+hollow               0.0031
+
+=====================================
+constitutional, t = 45
+=====================================
+culturally           0.0036
+copper               0.0035
+counterproductive    0.0034
+losses               0.0033
+weaponry             0.0033
+callous              0.0033
+preliminary          0.0032
+uncertainties        0.0032
+revised              0.0031
+hollow               0.0031

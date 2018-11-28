@@ -1,0 +1,645 @@
+
+
+=====================================
+chinese, t = 0
+=====================================
+euphoria             0.7962
+supervising          0.7547
+traumatic            0.7471
+predominance         0.7465
+specially            0.6343
+handicaps            0.2208
+haitians             -0.0000
+speculative          -0.0514
+haunt                -0.0866
+skillful             -0.1654
+
+=====================================
+chinese, t = 1
+=====================================
+euphoria             0.7961
+supervising          0.7546
+traumatic            0.7470
+predominance         0.7464
+specially            0.6342
+handicaps            0.2207
+haitians             -0.0000
+speculative          -0.0515
+haunt                -0.0866
+skillful             -0.1655
+
+=====================================
+chinese, t = 2
+=====================================
+euphoria             0.7961
+supervising          0.7547
+traumatic            0.7470
+predominance         0.7464
+specially            0.6343
+handicaps            0.2207
+haitians             -0.0000
+speculative          -0.0514
+haunt                -0.0866
+skillful             -0.1654
+
+=====================================
+chinese, t = 3
+=====================================
+euphoria             0.7962
+supervising          0.7547
+traumatic            0.7471
+predominance         0.7465
+specially            0.6343
+handicaps            0.2208
+haitians             -0.0000
+speculative          -0.0515
+haunt                -0.0866
+skillful             -0.1655
+
+=====================================
+chinese, t = 4
+=====================================
+euphoria             0.7962
+supervising          0.7547
+traumatic            0.7470
+predominance         0.7465
+specially            0.6343
+handicaps            0.2207
+haitians             -0.0000
+speculative          -0.0515
+haunt                -0.0866
+skillful             -0.1654
+
+=====================================
+chinese, t = 5
+=====================================
+euphoria             0.7962
+supervising          0.7547
+traumatic            0.7471
+predominance         0.7464
+specially            0.6343
+handicaps            0.2207
+haitians             -0.0000
+speculative          -0.0515
+haunt                -0.0866
+skillful             -0.1655
+
+=====================================
+chinese, t = 6
+=====================================
+euphoria             0.7961
+supervising          0.7546
+traumatic            0.7470
+predominance         0.7464
+specially            0.6342
+handicaps            0.2207
+haitians             -0.0000
+speculative          -0.0514
+haunt                -0.0866
+skillful             -0.1654
+
+=====================================
+chinese, t = 7
+=====================================
+euphoria             0.7961
+supervising          0.7546
+traumatic            0.7470
+predominance         0.7464
+specially            0.6342
+handicaps            0.2207
+haitians             -0.0000
+speculative          -0.0514
+haunt                -0.0866
+skillful             -0.1654
+
+=====================================
+chinese, t = 8
+=====================================
+euphoria             0.7961
+supervising          0.7546
+traumatic            0.7470
+predominance         0.7464
+specially            0.6342
+handicaps            0.2207
+haitians             -0.0000
+speculative          -0.0515
+haunt                -0.0866
+skillful             -0.1654
+
+=====================================
+chinese, t = 9
+=====================================
+euphoria             0.7959
+supervising          0.7544
+traumatic            0.7468
+predominance         0.7462
+specially            0.6341
+handicaps            0.2207
+haitians             -0.0000
+speculative          -0.0514
+haunt                -0.0866
+skillful             -0.1654
+
+=====================================
+chinese, t = 10
+=====================================
+euphoria             0.7961
+supervising          0.7547
+traumatic            0.7470
+predominance         0.7464
+specially            0.6343
+handicaps            0.2207
+haitians             -0.0000
+speculative          -0.0514
+haunt                -0.0866
+skillful             -0.1654
+
+=====================================
+chinese, t = 11
+=====================================
+euphoria             0.7959
+supervising          0.7545
+traumatic            0.7468
+predominance         0.7462
+specially            0.6341
+handicaps            0.2207
+haitians             -0.0000
+speculative          -0.0515
+haunt                -0.0866
+skillful             -0.1654
+
+=====================================
+chinese, t = 12
+=====================================
+euphoria             0.7962
+supervising          0.7547
+traumatic            0.7470
+predominance         0.7465
+specially            0.6343
+handicaps            0.2208
+haitians             -0.0000
+speculative          -0.0514
+haunt                -0.0866
+skillful             -0.1654
+
+=====================================
+chinese, t = 13
+=====================================
+euphoria             0.7961
+supervising          0.7546
+traumatic            0.7470
+predominance         0.7464
+specially            0.6342
+handicaps            0.2207
+haitians             -0.0000
+speculative          -0.0515
+haunt                -0.0866
+skillful             -0.1654
+
+=====================================
+chinese, t = 14
+=====================================
+euphoria             0.7962
+supervising          0.7547
+traumatic            0.7470
+predominance         0.7465
+specially            0.6343
+handicaps            0.2208
+haitians             -0.0000
+speculative          -0.0514
+haunt                -0.0866
+skillful             -0.1654
+
+=====================================
+chinese, t = 15
+=====================================
+euphoria             0.7961
+supervising          0.7546
+traumatic            0.7470
+predominance         0.7464
+specially            0.6342
+handicaps            0.2207
+haitians             -0.0000
+speculative          -0.0515
+haunt                -0.0866
+skillful             -0.1654
+
+=====================================
+chinese, t = 16
+=====================================
+euphoria             0.7962
+supervising          0.7548
+traumatic            0.7471
+predominance         0.7465
+specially            0.6343
+handicaps            0.2208
+haitians             -0.0000
+speculative          -0.0515
+haunt                -0.0866
+skillful             -0.1654
+
+=====================================
+chinese, t = 17
+=====================================
+euphoria             0.7962
+supervising          0.7547
+traumatic            0.7471
+predominance         0.7465
+specially            0.6343
+handicaps            0.2208
+haitians             -0.0000
+speculative          -0.0515
+haunt                -0.0866
+skillful             -0.1655
+
+=====================================
+chinese, t = 18
+=====================================
+euphoria             0.7962
+supervising          0.7547
+traumatic            0.7471
+predominance         0.7465
+specially            0.6343
+handicaps            0.2208
+haitians             -0.0000
+speculative          -0.0514
+haunt                -0.0866
+skillful             -0.1654
+
+=====================================
+chinese, t = 19
+=====================================
+euphoria             0.7961
+supervising          0.7546
+traumatic            0.7470
+predominance         0.7464
+specially            0.6342
+handicaps            0.2207
+haitians             -0.0000
+speculative          -0.0515
+haunt                -0.0866
+skillful             -0.1654
+
+=====================================
+chinese, t = 20
+=====================================
+euphoria             0.7961
+supervising          0.7547
+traumatic            0.7470
+predominance         0.7464
+specially            0.6343
+handicaps            0.2207
+haitians             -0.0000
+speculative          -0.0515
+haunt                -0.0866
+skillful             -0.1654
+
+=====================================
+chinese, t = 21
+=====================================
+euphoria             0.7960
+supervising          0.7545
+traumatic            0.7469
+predominance         0.7463
+specially            0.6341
+handicaps            0.2207
+haitians             -0.0000
+speculative          -0.0515
+haunt                -0.0866
+skillful             -0.1654
+
+=====================================
+chinese, t = 22
+=====================================
+euphoria             0.7962
+supervising          0.7547
+traumatic            0.7470
+predominance         0.7465
+specially            0.6343
+handicaps            0.2207
+haitians             -0.0000
+speculative          -0.0515
+haunt                -0.0866
+skillful             -0.1654
+
+=====================================
+chinese, t = 23
+=====================================
+euphoria             0.7959
+supervising          0.7545
+traumatic            0.7469
+predominance         0.7462
+specially            0.6341
+handicaps            0.2207
+haitians             -0.0000
+speculative          -0.0515
+haunt                -0.0866
+skillful             -0.1654
+
+=====================================
+chinese, t = 24
+=====================================
+euphoria             0.7962
+supervising          0.7547
+traumatic            0.7470
+predominance         0.7464
+specially            0.6343
+handicaps            0.2207
+haitians             -0.0000
+speculative          -0.0515
+haunt                -0.0866
+skillful             -0.1654
+
+=====================================
+chinese, t = 25
+=====================================
+euphoria             0.7961
+supervising          0.7546
+traumatic            0.7470
+predominance         0.7463
+specially            0.6342
+handicaps            0.2207
+haitians             -0.0000
+speculative          -0.0515
+haunt                -0.0866
+skillful             -0.1654
+
+=====================================
+chinese, t = 26
+=====================================
+euphoria             0.7961
+supervising          0.7547
+traumatic            0.7470
+predominance         0.7464
+specially            0.6343
+handicaps            0.2207
+haitians             -0.0000
+speculative          -0.0515
+haunt                -0.0866
+skillful             -0.1654
+
+=====================================
+chinese, t = 27
+=====================================
+euphoria             0.7962
+supervising          0.7547
+traumatic            0.7471
+predominance         0.7464
+specially            0.6342
+handicaps            0.2207
+haitians             -0.0000
+speculative          -0.0515
+haunt                -0.0866
+skillful             -0.1654
+
+=====================================
+chinese, t = 28
+=====================================
+euphoria             0.7961
+supervising          0.7546
+traumatic            0.7470
+predominance         0.7464
+specially            0.6342
+handicaps            0.2207
+haitians             -0.0000
+speculative          -0.0515
+haunt                -0.0866
+skillful             -0.1655
+
+=====================================
+chinese, t = 29
+=====================================
+euphoria             0.7961
+supervising          0.7546
+traumatic            0.7470
+predominance         0.7464
+specially            0.6342
+handicaps            0.2207
+haitians             -0.0000
+speculative          -0.0515
+haunt                -0.0866
+skillful             -0.1654
+
+=====================================
+chinese, t = 30
+=====================================
+euphoria             0.7960
+supervising          0.7545
+traumatic            0.7469
+predominance         0.7463
+specially            0.6341
+handicaps            0.2207
+haitians             -0.0000
+speculative          -0.0515
+haunt                -0.0866
+skillful             -0.1654
+
+=====================================
+chinese, t = 31
+=====================================
+euphoria             0.7960
+supervising          0.7545
+traumatic            0.7469
+predominance         0.7463
+specially            0.6341
+handicaps            0.2207
+haitians             -0.0000
+speculative          -0.0515
+haunt                -0.0866
+skillful             -0.1654
+
+=====================================
+chinese, t = 32
+=====================================
+euphoria             0.7959
+supervising          0.7545
+traumatic            0.7469
+predominance         0.7462
+specially            0.6341
+handicaps            0.2206
+haitians             -0.0000
+speculative          -0.0515
+haunt                -0.0866
+skillful             -0.1654
+
+=====================================
+chinese, t = 33
+=====================================
+euphoria             0.7961
+supervising          0.7546
+traumatic            0.7470
+predominance         0.7463
+specially            0.6342
+handicaps            0.2207
+haitians             -0.0000
+speculative          -0.0515
+haunt                -0.0866
+skillful             -0.1654
+
+=====================================
+chinese, t = 34
+=====================================
+euphoria             0.7959
+supervising          0.7544
+traumatic            0.7469
+predominance         0.7462
+specially            0.6340
+handicaps            0.2206
+haitians             -0.0000
+speculative          -0.0516
+haunt                -0.0866
+skillful             -0.1654
+
+=====================================
+chinese, t = 35
+=====================================
+euphoria             0.7961
+supervising          0.7546
+traumatic            0.7470
+predominance         0.7464
+specially            0.6342
+handicaps            0.2207
+haitians             -0.0000
+speculative          -0.0515
+haunt                -0.0866
+skillful             -0.1655
+
+=====================================
+chinese, t = 36
+=====================================
+euphoria             0.7959
+supervising          0.7545
+traumatic            0.7469
+predominance         0.7462
+specially            0.6341
+handicaps            0.2206
+haitians             -0.0000
+speculative          -0.0515
+haunt                -0.0866
+skillful             -0.1654
+
+=====================================
+chinese, t = 37
+=====================================
+euphoria             0.7961
+supervising          0.7546
+traumatic            0.7470
+predominance         0.7464
+specially            0.6342
+handicaps            0.2207
+haitians             -0.0000
+speculative          -0.0516
+haunt                -0.0866
+skillful             -0.1655
+
+=====================================
+chinese, t = 38
+=====================================
+euphoria             0.7960
+supervising          0.7545
+traumatic            0.7470
+predominance         0.7463
+specially            0.6341
+handicaps            0.2207
+haitians             -0.0000
+speculative          -0.0515
+haunt                -0.0866
+skillful             -0.1654
+
+=====================================
+chinese, t = 39
+=====================================
+euphoria             0.7961
+supervising          0.7546
+traumatic            0.7470
+predominance         0.7464
+specially            0.6342
+handicaps            0.2207
+haitians             -0.0000
+speculative          -0.0516
+haunt                -0.0866
+skillful             -0.1655
+
+=====================================
+chinese, t = 40
+=====================================
+euphoria             0.7960
+supervising          0.7546
+traumatic            0.7470
+predominance         0.7463
+specially            0.6341
+handicaps            0.2207
+haitians             -0.0000
+speculative          -0.0515
+haunt                -0.0866
+skillful             -0.1654
+
+=====================================
+chinese, t = 41
+=====================================
+euphoria             0.7960
+supervising          0.7545
+traumatic            0.7469
+predominance         0.7463
+specially            0.6341
+handicaps            0.2206
+haitians             -0.0000
+speculative          -0.0516
+haunt                -0.0866
+skillful             -0.1654
+
+=====================================
+chinese, t = 42
+=====================================
+euphoria             0.7959
+supervising          0.7545
+traumatic            0.7469
+predominance         0.7462
+specially            0.6341
+handicaps            0.2206
+haitians             -0.0000
+speculative          -0.0515
+haunt                -0.0866
+skillful             -0.1654
+
+=====================================
+chinese, t = 43
+=====================================
+euphoria             0.7959
+supervising          0.7544
+traumatic            0.7469
+predominance         0.7462
+specially            0.6340
+handicaps            0.2206
+haitians             -0.0000
+speculative          -0.0516
+haunt                -0.0866
+skillful             -0.1654
+
+=====================================
+chinese, t = 44
+=====================================
+euphoria             0.7961
+supervising          0.7546
+traumatic            0.7470
+predominance         0.7463
+specially            0.6342
+handicaps            0.2207
+haitians             -0.0000
+speculative          -0.0515
+haunt                -0.0867
+skillful             -0.1654
+
+=====================================
+chinese, t = 45
+=====================================
+euphoria             0.7959
+supervising          0.7544
+traumatic            0.7469
+predominance         0.7462
+specially            0.6340
+handicaps            0.2206
+haitians             -0.0000
+speculative          -0.0516
+haunt                -0.0866
+skillful             -0.1654

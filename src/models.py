@@ -1466,7 +1466,6 @@ class dynamic_clustering_dynamic_context_bern_emb_model(emb_model):
 
         for data_pass in range(self.n_iter):
             for step in range(self.n_epochs):
-                print(step)
                 if step % 100 == 0 and step > 0:
                     print(str(step) + '/' + str(self.n_epochs) +
                           '   iter ' + str(data_pass))

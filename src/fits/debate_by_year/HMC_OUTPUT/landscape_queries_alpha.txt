@@ -1,0 +1,645 @@
+
+
+=====================================
+landscape, t = 0
+=====================================
+copper               0.0035
+culturally           0.0034
+counterproductive    0.0034
+spectacular          0.0034
+kissinger            0.0033
+uncertainties        0.0033
+weaponry             0.0033
+revised              0.0033
+tree                 0.0032
+merciless            0.0032
+
+=====================================
+landscape, t = 1
+=====================================
+copper               0.0035
+spectacular          0.0034
+culturally           0.0034
+counterproductive    0.0034
+kissinger            0.0033
+uncertainties        0.0033
+weaponry             0.0033
+revised              0.0032
+tree                 0.0032
+flout                0.0032
+
+=====================================
+landscape, t = 2
+=====================================
+copper               0.0035
+culturally           0.0034
+spectacular          0.0034
+counterproductive    0.0034
+kissinger            0.0033
+uncertainties        0.0033
+weaponry             0.0033
+tree                 0.0032
+revised              0.0032
+flout                0.0032
+
+=====================================
+landscape, t = 3
+=====================================
+romanian             0.0044
+copper               0.0035
+culturally           0.0034
+spectacular          0.0034
+counterproductive    0.0034
+weaponry             0.0033
+uncertainties        0.0033
+kissinger            0.0033
+tree                 0.0032
+flout                0.0032
+
+=====================================
+landscape, t = 4
+=====================================
+copper               0.0035
+culturally           0.0034
+counterproductive    0.0034
+spectacular          0.0033
+weaponry             0.0033
+uncertainties        0.0033
+kissinger            0.0033
+romanian             0.0033
+flout                0.0032
+tree                 0.0032
+
+=====================================
+landscape, t = 5
+=====================================
+copper               0.0035
+culturally           0.0034
+counterproductive    0.0034
+kissinger            0.0033
+weaponry             0.0033
+uncertainties        0.0033
+flout                0.0032
+spectacular          0.0032
+tree                 0.0032
+callous              0.0032
+
+=====================================
+landscape, t = 6
+=====================================
+copper               0.0035
+culturally           0.0034
+counterproductive    0.0034
+weaponry             0.0033
+kissinger            0.0033
+uncertainties        0.0033
+tree                 0.0032
+flout                0.0032
+callous              0.0032
+merciless            0.0032
+
+=====================================
+landscape, t = 7
+=====================================
+copper               0.0035
+culturally           0.0034
+counterproductive    0.0034
+weaponry             0.0033
+kissinger            0.0033
+uncertainties        0.0032
+tree                 0.0032
+callous              0.0032
+flout                0.0032
+merciless            0.0032
+
+=====================================
+landscape, t = 8
+=====================================
+copper               0.0035
+culturally           0.0034
+counterproductive    0.0034
+weaponry             0.0033
+kissinger            0.0033
+flout                0.0032
+uncertainties        0.0032
+tree                 0.0032
+callous              0.0032
+merciless            0.0032
+
+=====================================
+landscape, t = 9
+=====================================
+copper               0.0035
+culturally           0.0034
+counterproductive    0.0034
+weaponry             0.0033
+kissinger            0.0033
+tree                 0.0032
+callous              0.0032
+flout                0.0032
+preliminary          0.0031
+uncertainties        0.0031
+
+=====================================
+landscape, t = 10
+=====================================
+copper               0.0035
+culturally           0.0034
+counterproductive    0.0034
+weaponry             0.0033
+kissinger            0.0033
+accomplis            0.0032
+flout                0.0032
+merciless            0.0032
+tree                 0.0032
+callous              0.0032
+
+=====================================
+landscape, t = 11
+=====================================
+copper               0.0035
+culturally           0.0034
+counterproductive    0.0034
+weaponry             0.0033
+kissinger            0.0032
+preliminary          0.0032
+merciless            0.0032
+callous              0.0032
+tree                 0.0032
+flout                0.0032
+
+=====================================
+landscape, t = 12
+=====================================
+copper               0.0035
+culturally           0.0034
+counterproductive    0.0034
+weaponry             0.0033
+kissinger            0.0032
+accomplis            0.0032
+preliminary          0.0032
+callous              0.0032
+tree                 0.0032
+flout                0.0032
+
+=====================================
+landscape, t = 13
+=====================================
+copper               0.0035
+culturally           0.0035
+counterproductive    0.0034
+weaponry             0.0033
+kissinger            0.0032
+preliminary          0.0032
+flout                0.0032
+revised              0.0032
+callous              0.0032
+tree                 0.0032
+
+=====================================
+landscape, t = 14
+=====================================
+copper               0.0035
+culturally           0.0035
+counterproductive    0.0034
+weaponry             0.0033
+preliminary          0.0033
+revised              0.0032
+kissinger            0.0032
+flout                0.0032
+callous              0.0032
+tree                 0.0032
+
+=====================================
+landscape, t = 15
+=====================================
+copper               0.0035
+culturally           0.0035
+counterproductive    0.0034
+weaponry             0.0033
+preliminary          0.0033
+revised              0.0032
+kissinger            0.0032
+callous              0.0032
+flout                0.0032
+tree                 0.0032
+
+=====================================
+landscape, t = 16
+=====================================
+copper               0.0035
+culturally           0.0035
+counterproductive    0.0034
+weaponry             0.0033
+revised              0.0033
+preliminary          0.0032
+callous              0.0032
+kissinger            0.0032
+justifiable          0.0032
+flout                0.0032
+
+=====================================
+landscape, t = 17
+=====================================
+copper               0.0035
+culturally           0.0035
+counterproductive    0.0034
+preliminary          0.0033
+revised              0.0033
+callous              0.0032
+weaponry             0.0032
+kissinger            0.0032
+flout                0.0032
+justifiable          0.0032
+
+=====================================
+landscape, t = 18
+=====================================
+copper               0.0035
+culturally           0.0035
+counterproductive    0.0034
+revised              0.0033
+preliminary          0.0033
+callous              0.0032
+flout                0.0032
+justifiable          0.0032
+kissinger            0.0032
+weaponry             0.0031
+
+=====================================
+landscape, t = 19
+=====================================
+copper               0.0035
+culturally           0.0035
+counterproductive    0.0034
+revised              0.0033
+preliminary          0.0033
+weaponry             0.0032
+callous              0.0032
+flout                0.0032
+kissinger            0.0031
+justifiable          0.0031
+
+=====================================
+landscape, t = 20
+=====================================
+copper               0.0035
+culturally           0.0035
+counterproductive    0.0034
+revised              0.0033
+preliminary          0.0033
+weaponry             0.0032
+callous              0.0032
+flout                0.0032
+tree                 0.0031
+kissinger            0.0031
+
+=====================================
+landscape, t = 21
+=====================================
+copper               0.0035
+culturally           0.0035
+counterproductive    0.0034
+weaponry             0.0033
+preliminary          0.0033
+revised              0.0032
+callous              0.0032
+flout                0.0032
+tree                 0.0031
+justifiable          0.0031
+
+=====================================
+landscape, t = 22
+=====================================
+copper               0.0035
+culturally           0.0035
+counterproductive    0.0034
+weaponry             0.0034
+preliminary          0.0032
+revised              0.0032
+callous              0.0032
+flout                0.0032
+tree                 0.0031
+justifiable          0.0031
+
+=====================================
+landscape, t = 23
+=====================================
+copper               0.0035
+culturally           0.0035
+weaponry             0.0034
+counterproductive    0.0034
+preliminary          0.0032
+revised              0.0032
+callous              0.0032
+flout                0.0032
+tree                 0.0031
+justifiable          0.0031
+
+=====================================
+landscape, t = 24
+=====================================
+culturally           0.0035
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+preliminary          0.0033
+revised              0.0032
+callous              0.0032
+flout                0.0032
+tree                 0.0031
+romanian             0.0031
+
+=====================================
+landscape, t = 25
+=====================================
+culturally           0.0035
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+preliminary          0.0033
+callous              0.0032
+revised              0.0032
+flout                0.0031
+tree                 0.0031
+romanian             0.0031
+
+=====================================
+landscape, t = 26
+=====================================
+culturally           0.0035
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+preliminary          0.0033
+callous              0.0032
+revised              0.0032
+flout                0.0031
+tree                 0.0031
+romanian             0.0031
+
+=====================================
+landscape, t = 27
+=====================================
+culturally           0.0035
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+preliminary          0.0032
+callous              0.0032
+revised              0.0032
+flout                0.0031
+tree                 0.0031
+fledgling            0.0031
+
+=====================================
+landscape, t = 28
+=====================================
+culturally           0.0035
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+preliminary          0.0032
+callous              0.0032
+revised              0.0032
+flout                0.0031
+fledgling            0.0031
+tree                 0.0031
+
+=====================================
+landscape, t = 29
+=====================================
+culturally           0.0035
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+callous              0.0032
+preliminary          0.0032
+revised              0.0032
+flout                0.0031
+tree                 0.0031
+fledgling            0.0031
+
+=====================================
+landscape, t = 30
+=====================================
+culturally           0.0035
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+callous              0.0032
+preliminary          0.0032
+revised              0.0032
+flout                0.0031
+hollow               0.0031
+tree                 0.0031
+
+=====================================
+landscape, t = 31
+=====================================
+culturally           0.0035
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+callous              0.0032
+preliminary          0.0032
+revised              0.0032
+flout                0.0031
+hollow               0.0031
+tree                 0.0031
+
+=====================================
+landscape, t = 32
+=====================================
+culturally           0.0036
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+callous              0.0032
+preliminary          0.0032
+revised              0.0032
+uncertainties        0.0032
+hollow               0.0031
+flout                0.0031
+
+=====================================
+landscape, t = 33
+=====================================
+culturally           0.0036
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+callous              0.0032
+preliminary          0.0032
+uncertainties        0.0032
+revised              0.0032
+hollow               0.0031
+flout                0.0031
+
+=====================================
+landscape, t = 34
+=====================================
+culturally           0.0036
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+uncertainties        0.0033
+callous              0.0032
+preliminary          0.0032
+revised              0.0032
+hollow               0.0031
+flout                0.0031
+
+=====================================
+landscape, t = 35
+=====================================
+culturally           0.0036
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+revised              0.0033
+preliminary          0.0033
+callous              0.0032
+uncertainties        0.0032
+losses               0.0032
+hollow               0.0031
+
+=====================================
+landscape, t = 36
+=====================================
+culturally           0.0036
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+revised              0.0033
+uncertainties        0.0033
+preliminary          0.0033
+callous              0.0033
+losses               0.0032
+hollow               0.0031
+
+=====================================
+landscape, t = 37
+=====================================
+culturally           0.0036
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+callous              0.0033
+preliminary          0.0032
+losses               0.0032
+uncertainties        0.0032
+hollow               0.0031
+flout                0.0031
+
+=====================================
+landscape, t = 38
+=====================================
+culturally           0.0036
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+losses               0.0033
+uncertainties        0.0033
+callous              0.0033
+preliminary          0.0032
+hollow               0.0031
+flout                0.0031
+
+=====================================
+landscape, t = 39
+=====================================
+culturally           0.0036
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+callous              0.0033
+losses               0.0033
+preliminary          0.0032
+revised              0.0032
+uncertainties        0.0032
+hollow               0.0031
+
+=====================================
+landscape, t = 40
+=====================================
+culturally           0.0036
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+losses               0.0033
+revised              0.0033
+callous              0.0033
+preliminary          0.0032
+uncertainties        0.0032
+hollow               0.0031
+
+=====================================
+landscape, t = 41
+=====================================
+culturally           0.0036
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+losses               0.0033
+uncertainties        0.0033
+callous              0.0033
+preliminary          0.0032
+revised              0.0032
+hollow               0.0031
+
+=====================================
+landscape, t = 42
+=====================================
+culturally           0.0036
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+losses               0.0033
+callous              0.0033
+preliminary          0.0032
+uncertainties        0.0032
+revised              0.0031
+hollow               0.0031
+
+=====================================
+landscape, t = 43
+=====================================
+culturally           0.0036
+copper               0.0035
+counterproductive    0.0034
+weaponry             0.0033
+losses               0.0033
+preliminary          0.0033
+callous              0.0033
+uncertainties        0.0032
+revised              0.0031
+hollow               0.0031
+
+=====================================
+landscape, t = 44
+=====================================
+culturally           0.0036
+copper               0.0035
+counterproductive    0.0034
+losses               0.0033
+weaponry             0.0033
+callous              0.0033
+preliminary          0.0032
+uncertainties        0.0032
+revised              0.0031
+hollow               0.0031
+
+=====================================
+landscape, t = 45
+=====================================
+culturally           0.0036
+copper               0.0035
+counterproductive    0.0034
+losses               0.0033
+weaponry             0.0033
+callous              0.0033
+preliminary          0.0032
+uncertainties        0.0032
+revised              0.0031
+hollow               0.0031

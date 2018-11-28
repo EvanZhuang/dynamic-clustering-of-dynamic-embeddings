@@ -1,0 +1,15 @@
+
+
+=====================================
+politics
+=====================================
+predominance         0.5697
+inherit              0.5697
+impelled             0.5697
+unison               0.5696
+dis                  0.5694
+bast                 0.5678
+pathway              0.1679
+readied              0.0007
+beslan               0.0000
+dante                0.0000
