@@ -17,7 +17,6 @@ tfb = tfp.bijectors
 #dtype = np.float32
 
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
-tf.logging.set_verbosity(tf.logging.ERROR)
 
 class emb_model(object):
     def __init__(self, args, d, logdir):
@@ -43,7 +42,6 @@ class emb_model(object):
         self.test_feed = d.test_feed
         self.n_iter = args.n_iter
         self.n_epochs = d.n_epochs
-        self.n_test = d.n_test
         self.n_valid = d.n_valid
         self.alpha_trainable = True
         self.VI = args.VI
@@ -137,18 +135,26 @@ class emb_model(object):
 
 
     def train_embeddings(self):
+        import matplotlib.pyplot as plt
+        train_loss_list = []
         for data_pass in range(self.n_iter):
             for step in range(self.n_epochs):
                 if step % 10 == 0:
                     print(str(step)+'/'+str(self.n_epochs)+'   iter '+str(data_pass))
-                    self.print_topics()
-                    summary,_ = self.sess.run([self.summaries, self.train], feed_dict=self.train_feed(self.placeholders))
+                    summary,_, loss = self.sess.run([self.summaries, self.train, self.loss], feed_dict=self.train_feed(self.placeholders))
                     self.train_writer.add_summary(summary, data_pass*(self.n_epochs) + step)
                 else:
-                    self.sess.run([self.train], feed_dict=self.train_feed(self.placeholders))
+                    _,loss = self.sess.run([self.train, self.loss], feed_dict=self.train_feed(self.placeholders))
+                train_loss_list.append(loss)
             self.dump(self.logdir+"/variational"+str(data_pass)+".dat")
             self.saver.save(self.sess, os.path.join(self.logdir, "model.ckpt"), data_pass)
-        self.print_topics()
+        title = "Training Loss over the process"
+        plt.figure()
+        plt.plot(train_loss_list, 'black', label='loss')
+        plt.xlabel("N iteration")
+        plt.ylabel("Training Loss")
+        plt.title(title)
+        plt.savefig(self.logdir + "/" + title + ".png")
         self.print_word_similarities(self.query_words, 10)
         if self.dynamic:
             words = self.detect_drift()
@@ -218,7 +224,7 @@ class bern_emb_model(emb_model):
             self.log_likelihood = self.ll_pos + self.ll_neg
 
             scale = 1.0*self.N/self.n_minibatch
-            self.loss = - (self.n_epochs * self.log_likelihood + self.log_prior)
+            self.loss = - (self.log_likelihood + self.log_prior)
 
 
     def dump(self, fname):
@@ -294,7 +300,7 @@ class dynamic_bern_emb_model(emb_model):
                     self.ll_pos += tf.reduce_sum(self.y_pos[t].log_prob(1.0))
                     self.ll_neg += tf.reduce_sum(self.y_neg[t].log_prob(0.0))
 
-            self.loss = - (self.n_epochs * (self.ll_pos + self.ll_neg) + self.log_prior)
+            self.loss = - ((self.ll_pos + self.ll_neg) + self.log_prior)
 
     def dump(self, fname):
         with self.sess.as_default():
@@ -1001,25 +1007,25 @@ class GMM_HMC(object):
                 return i + 1, c
 
             i, c = tf.while_loop(condition, c_assign, [0, c])
-
-        init_op = tf.initialize_all_variables()
-        sess.run(init_op)
-        # sess.run(init_op)
-        [
-            self.acceptance_rate_,
-            self.pi_out,
-            self.mu_out,
-            self.sigma_out,
-            self.assignment,
-            self.assignment_likelihood
-        ] = sess.run([
-            acceptance_rate,
-            mean_mix_probs,
-            mean_loc,
-            mean_chol_precision,
-            c,
-            c_log
-        ])
+        with tf.Session() as sess:
+            init_op = tf.global_variables_initializer()
+            sess.run(init_op)
+            # sess.run(init_op)
+            [
+                self.acceptance_rate_,
+                self.pi_out,
+                self.mu_out,
+                self.sigma_out,
+                self.assignment,
+                self.assignment_likelihood
+            ] = sess.run([
+                acceptance_rate,
+                mean_mix_probs,
+                mean_loc,
+                mean_chol_precision,
+                c,
+                c_log
+            ])
 
 class dynamic_clustering_dynamic_context_bern_emb_model(emb_model):
     def __init__(self, args, d, logdir):
@@ -1092,6 +1098,7 @@ class dynamic_clustering_dynamic_context_bern_emb_model(emb_model):
 
         with tf.name_scope('likelihood'):
             self.placeholders = {}
+            #self.testholders = {}
             self.y_pos = {}
             self.y_neg = {}
             self.ll_pos = 0.0
@@ -1105,6 +1112,8 @@ class dynamic_clustering_dynamic_context_bern_emb_model(emb_model):
                 ctx_mask = tf.concat([rows + columns, rows + columns + int(self.cs / 2) + 1], 1)
 
                 # Data Placeholder
+                #self.testholders[t] = tf.placeholder(tf.int32, shape=(self.n_test[t] + self.cs),
+                #                                     name="testholder" + str(t))
                 self.placeholders[t] = tf.placeholder(tf.int32, shape=(self.n_minibatch[t] + self.cs))
 
                 # Taget and Context Indices
@@ -1175,16 +1184,18 @@ class dynamic_clustering_dynamic_context_bern_emb_model(emb_model):
     def train_embeddings(self):
         import matplotlib.pyplot as plt
         train_loss_list = []
+        log_loss_list = []
 
         for data_pass in range(self.n_iter):
             for step in range(self.n_epochs):
+                print(step)
                 if step % 100 == 0 and step > 0:
                     print(str(step)+'/'+str(self.n_epochs)+'   iter '+str(data_pass))
-                    summary,_, train_loss, rho = self.sess.run([self.summaries, self.train, self.loss,self.rho], feed_dict=self.train_feed(self.placeholders))
-                    train_loss_list.append(train_loss)
+                    summary,_, train_loss, log_loss, rho = self.sess.run([self.summaries, self.train, self.loss, self.log_prob,self.rho], feed_dict=self.train_feed(self.placeholders))
+
                     print("GMM Start")
                     if self.VI:
-                        self.GMM = GMM_SGAVI(xn=rho, maxIter=1, K=self.components)
+                        self.GMM = GMM_SGAVI(xn=rho, maxIter=5, K=self.components)
                     elif self.HMC:
                         self.GMM = GMM_HMC(observations=rho, components=self.components)
                     print("GMM Over")
@@ -1193,7 +1204,9 @@ class dynamic_clustering_dynamic_context_bern_emb_model(emb_model):
                     self.mix_prob = tf.convert_to_tensor(self.GMM.pi_out)
                     self.train_writer.add_summary(summary, data_pass*(self.n_epochs) + step)
                 else:
-                    self.sess.run([self.train], feed_dict=self.train_feed(self.placeholders))
+                    _, train_loss, log_loss = self.sess.run([self.train, self.loss, self.log_prob], feed_dict=self.train_feed(self.placeholders))
+                train_loss_list.append(train_loss)
+                log_loss_list.append(log_loss)
             self.dump(self.logdir+"/variational"+str(data_pass)+".dat")
             self.saver.save(self.sess, os.path.join(self.logdir, "model.ckpt"), data_pass)
             self.print_topics()
@@ -1202,28 +1215,41 @@ class dynamic_clustering_dynamic_context_bern_emb_model(emb_model):
             words = self.detect_drift()
             self.print_word_similarities_alpha(words[:10], 10)
         title = "Training Loss over the process"
+        plt.figure()
         plt.plot(train_loss_list, 'black', label='loss')
         plt.xlabel("N iteration")
         plt.ylabel("Training Loss")
         plt.title(title)
         # save image
-        plt.savefig(title + ".png")
+        plt.savefig(self.logdir + "/" + title + ".png")
+        plt.figure()
+        title = "Log mixture prob over the process"
+        plt.plot(log_loss_list, 'black', label='loss')
+        plt.xlabel("N iteration")
+        plt.ylabel("Log mixture prob")
+        plt.title(title)
+        plt.savefig(self.logdir + "/" + title + ".png")
         self.plot_params(500)
-        #print(self.eval_log_like(feed_dict=self.test_feed(self.placeholders)))
+        #print(self.eval_log_like(feed_dict=self.test_feed(self.testholders)))
 
     def dump(self, fname):
         with self.sess.as_default():
             dat = {'rho': self.rho.eval()}
             for t in range(self.T):
                 dat['alpha_' + str(t)] =  self.alpha_t[t].eval()
+            dat['mean'] = self.mean.eval()
+            dat['scale'] = self.scale.eval()
+            dat['pi'] = self.mix_prob.eval()
+
         pickle.dump(dat, open(fname, "wb"))
 
     def eval_log_like(self, feed_dict):
-        log_p = np.zeros((0, 1))
-        for t in range(self.T):
-            log_p_t = self.sess.run(tf.log(self.y_pos[t].mean() + 0.000001), feed_dict=feed_dict)
-            log_p = np.vstack((log_p, log_p_t))
-        return log_p
+        with self.sess.as_default():
+            log_p = np.zeros((0, 1))
+            for t in range(self.T):
+                log_p_t = self.sess.run(tf.log(self.y_pos[t].mean() + 0.000001), feed_dict=feed_dict)
+                log_p = np.vstack((log_p, log_p_t))
+            return log_p
 
     def plot_params(self, plot_only=500):
         with self.sess.as_default():
@@ -1284,7 +1310,7 @@ class dynamic_clustering_dynamic_context_bern_emb_model(emb_model):
                 for j in range(self.L):
                     if c_[j] == i:
                         word_list.append(self.labels[j])
-                file_name = "./topic_" + str(i) + ".txt"
+                file_name = self.logdir + "/topic_" + str(i) + ".txt"
                 with open(file_name, 'w') as f:
                     for item in word_list:
                         f.write("%s\n" % item)
