@@ -1078,7 +1078,6 @@ class GMM_SGAVI(object):
                          lambda_beta, lambda_nu, lambda_w],
                         feed_dict={idx_tensor: idx})
 
-                print(lb)
                 lb = lb * (N / BATCH_SIZE)
                 aux_lbs.append(lb)
                 if len(aux_lbs) == (N / BATCH_SIZE):
@@ -1092,12 +1091,10 @@ class GMM_SGAVI(object):
             # pi: pi_out
             # phi: assignment
         covs = []
-        print(w_out)
-        print(m_out)
         for k in range(K):
             covs.append(np.linalg.cholesky(w_out[k, :, :]))
         zn = np.array([np.argmax(phi_out[n, :]) for n in range(N)])
-        max_zn = np.array([np.maximum(phi_out[n, :]) for n in range(N)])
+        max_zn = np.array([np.amax(phi_out[n, :]) for n in range(N)])
         self.pi_out = pi_out
         self.mu_out = m_out
         self.sigma_out = np.stack(covs, axis=0)
